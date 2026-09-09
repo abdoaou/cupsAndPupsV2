@@ -1,8 +1,8 @@
 {
   "framework": null,
   "installCommand": "echo 'Static site — skip install'",
-  "buildCommand": "node apps/web/scripts/prepare-vercel.js",
-  "outputDirectory": "apps/web/public",
+  "buildCommand": "node scripts/prepare-vercel.js",
+  "outputDirectory": "public",
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
