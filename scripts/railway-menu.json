@@ -1,0 +1,466 @@
+[
+  {
+    "name": "Lazy Cake",
+    "sortOrder": 0,
+    "description": null,
+    "price": 3.5,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Strawbary Matcha",
+    "sortOrder": 0,
+    "description": null,
+    "price": 6,
+    "isPetFriendly": false,
+    "category": "BEVERAGES"
+  },
+  {
+    "name": "Soft Cookie",
+    "sortOrder": 0,
+    "description": "Packaged Soft Cookie",
+    "price": 3,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Chocolate Rolls",
+    "sortOrder": 0,
+    "description": "Nutella and hazelnuts filled rolls",
+    "price": 4,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Cheese Rolls",
+    "sortOrder": 0,
+    "description": "Mozarella and akkawi filled brioche rolls",
+    "price": 4,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Iced Latte",
+    "sortOrder": 0,
+    "description": "Espresso, milk, ice",
+    "price": 4.25,
+    "isPetFriendly": false,
+    "category": "BEVERAGES"
+  },
+  {
+    "name": "Iced Spanish Latte",
+    "sortOrder": 0,
+    "description": "Espresso, milk, condensed milk, ice",
+    "price": 5.25,
+    "isPetFriendly": false,
+    "category": "BEVERAGES"
+  },
+  {
+    "name": "Chocolate Cake",
+    "sortOrder": 0,
+    "description": "Rich chocolate cake slice",
+    "price": 4,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Cinnamon Rolls",
+    "sortOrder": 0,
+    "description": "Cinnamon and sugar filled rolls topped with cream cheese frosting",
+    "price": 3,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Cold Brew",
+    "sortOrder": 0,
+    "description": "Cold brewed coffee, ice",
+    "price": 4.5,
+    "isPetFriendly": false,
+    "category": "BEVERAGES"
+  },
+  {
+    "name": "Iced Mocha",
+    "sortOrder": 0,
+    "description": "Espresso, chocolate sauce, milk, ice",
+    "price": 5.25,
+    "isPetFriendly": false,
+    "category": "BEVERAGES"
+  },
+  {
+    "name": "Iced Caramel Macchiato",
+    "sortOrder": 0,
+    "description": "Espresso, vanilla syrup, milk, caramel drizzle, ice",
+    "price": 5.5,
+    "isPetFriendly": false,
+    "category": "BEVERAGES"
+  },
+  {
+    "name": "Biscoff Crunch Soft Cookie",
+    "sortOrder": 0,
+    "description": "Packaged Soft Cookie",
+    "price": 3,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Brownie",
+    "sortOrder": 0,
+    "description": "Fudgy chocolate brownie",
+    "price": 3,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Red Velvet Soft Cookie",
+    "sortOrder": 0,
+    "description": "Packaged Soft Cookie",
+    "price": 3,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Hazelnut Latte",
+    "sortOrder": 0,
+    "description": "Espresso, hazelnut syrup, steamed milk",
+    "price": 4.75,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Iced Americano",
+    "sortOrder": 0,
+    "description": "Espresso, cold water, ice",
+    "price": 3.5,
+    "isPetFriendly": false,
+    "category": "BEVERAGES"
+  },
+  {
+    "name": "Americano",
+    "sortOrder": 0,
+    "description": "Espresso, hot water",
+    "price": 3,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Caramel Macchiato",
+    "sortOrder": 0,
+    "description": "Espresso, vanilla syrup, milk, caramel drizzle",
+    "price": 5.25,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Berry Velvet Cookie Cup",
+    "sortOrder": 0,
+    "description": "Delicious Berry Velvet Cookie Cup",
+    "price": 3.5,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Cappuccino",
+    "sortOrder": 0,
+    "description": "Espresso, steamed milk, milk foam",
+    "price": 4,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Matcha Latte",
+    "sortOrder": 0,
+    "description": "Matcha powder, milk, ice",
+    "price": 4.99,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Chocolate Frappuccino",
+    "sortOrder": 0,
+    "description": "Coffee, chocolate sauce, milk, ice, whipped cream",
+    "price": 5,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Strawberry Milkshake",
+    "sortOrder": 0,
+    "description": "Strawberry syrup, milk, ice cream, ice",
+    "price": 5.5,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Thyme Rolls",
+    "sortOrder": 0,
+    "description": "Zaatar filled brioche rolls",
+    "price": 4,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Frappuccino",
+    "sortOrder": 0,
+    "description": "Coffee, milk, ice, whipped cream",
+    "price": 4.5,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Creamy Hazelnut Soft Cookie",
+    "sortOrder": 0,
+    "description": "Packaged Soft Cookie",
+    "price": 3,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Lemon Cake",
+    "sortOrder": 0,
+    "description": "Zesty lemon cake slice",
+    "price": 3,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Extra Espresso Shot",
+    "sortOrder": 0,
+    "description": "Add-on extension shot",
+    "price": 1,
+    "isPetFriendly": false,
+    "category": "SPECIALS"
+  },
+  {
+    "name": "Oat Milk Substitute",
+    "sortOrder": 0,
+    "description": "Alternative milk option",
+    "price": 1,
+    "isPetFriendly": false,
+    "category": "SPECIALS"
+  },
+  {
+    "name": "Marbled Cake",
+    "sortOrder": 0,
+    "description": "Chocolate and vanilla marbled english cake",
+    "price": 3,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Double Espresso",
+    "sortOrder": 0,
+    "description": "Double shot of concentrated espresso.",
+    "price": 3,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Latte",
+    "sortOrder": 0,
+    "description": "Espresso, steamed milk, light foam",
+    "price": 4.25,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Flat White",
+    "sortOrder": 0,
+    "description": "Double espresso, steamed milk",
+    "price": 4.5,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Mocha",
+    "sortOrder": 0,
+    "description": "Espresso, chocolate sauce, steamed milk, whipped cream",
+    "price": 5,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Vanilla Latte",
+    "sortOrder": 0,
+    "description": "Espresso, vanilla syrup, steamed milk",
+    "price": 4.75,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Spanish Latte",
+    "sortOrder": 0,
+    "description": "Espresso, milk, condensed milk",
+    "price": 5.25,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Hot Chocolate",
+    "sortOrder": 0,
+    "description": "Milk, cocoa powder, chocolate sauce, whipped cream",
+    "price": 4,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Lemon  Cake",
+    "sortOrder": 0,
+    "description": "Whole loaf cake option",
+    "price": 3,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Flavored Tea",
+    "sortOrder": 0,
+    "description": "Green tea bag, hot water",
+    "price": 2.5,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Tea",
+    "sortOrder": 0,
+    "description": "Tea bag, hot water",
+    "price": 2,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Pawsitive Special Latte",
+    "sortOrder": 0,
+    "description": "Espresso, caramel syrup, vanilla syrup, milk, whipped cream",
+    "price": 6,
+    "isPetFriendly": true,
+    "category": "SPECIALS"
+  },
+  {
+    "name": "Puppy Mocha",
+    "sortOrder": 0,
+    "description": "Espresso, chocolate sauce, hazelnut syrup, milk",
+    "price": 5.5,
+    "isPetFriendly": true,
+    "category": "SPECIALS"
+  },
+  {
+    "name": "Midnight Coffee",
+    "sortOrder": 0,
+    "description": "Double espresso, dark chocolate, cold foam",
+    "price": 5,
+    "isPetFriendly": false,
+    "category": "SPECIALS"
+  },
+  {
+    "name": "Pink Paw Drink",
+    "sortOrder": 0,
+    "description": "Strawberry syrup, lemonade, soda, ice",
+    "price": 6,
+    "isPetFriendly": true,
+    "category": "SPECIALS"
+  },
+  {
+    "name": "Smores Cookie Cup",
+    "sortOrder": 0,
+    "description": "Delicious Smores Cookie Cup",
+    "price": 3.5,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Red Velvet Oreo Cookie Cup",
+    "sortOrder": 0,
+    "description": "Delicious Red Velvet Oreo Cookie Cup",
+    "price": 3.5,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Lotus Cookie Cup",
+    "sortOrder": 0,
+    "description": "Delicious Lotus Cookie Cup",
+    "price": 3.5,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Triple Chocolate Soft Cookie",
+    "sortOrder": 0,
+    "description": "Packaged Soft Cookie",
+    "price": 3,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  },
+  {
+    "name": "Whipped Cream",
+    "sortOrder": 0,
+    "description": "Extra fluffy whipped cream top",
+    "price": 0.75,
+    "isPetFriendly": false,
+    "category": "SPECIALS"
+  },
+  {
+    "name": "Vanilla Syrup Shot",
+    "sortOrder": 0,
+    "description": "Extra sweet flavoring",
+    "price": 0.75,
+    "isPetFriendly": false,
+    "category": "SPECIALS"
+  },
+  {
+    "name": "Hazelnut Syrup Shot",
+    "sortOrder": 0,
+    "description": "Extra sweet flavoring",
+    "price": 0.75,
+    "isPetFriendly": false,
+    "category": "SPECIALS"
+  },
+  {
+    "name": "Almond Milk Substitute",
+    "sortOrder": 0,
+    "description": "Alternative milk option",
+    "price": 1,
+    "isPetFriendly": false,
+    "category": "SPECIALS"
+  },
+  {
+    "name": "Caramel Sauce Drizzle",
+    "sortOrder": 0,
+    "description": "Extra drizzle",
+    "price": 0.75,
+    "isPetFriendly": false,
+    "category": "SPECIALS"
+  },
+  {
+    "name": "Oreo Milkshake",
+    "sortOrder": 0,
+    "description": "Oreo cookies, milk, vanilla ice cream, ice",
+    "price": 6.5,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Vanilla Milkshake",
+    "sortOrder": 0,
+    "description": "Vanilla ice cream, milk, vanilla syrup",
+    "price": 6,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Espresso",
+    "sortOrder": 0,
+    "description": "Rich and intense single shot of espresso.",
+    "price": 2,
+    "isPetFriendly": false,
+    "category": "COFFEE"
+  },
+  {
+    "name": "Cold Cups",
+    "sortOrder": 0,
+    "description": "Creamy cheesecake variant",
+    "price": 4,
+    "isPetFriendly": false,
+    "category": "FOOD"
+  }
+]

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shop · Cups &amp; Pups</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <header id="site-header"></header>
+    <main class="page">
+      <h1>Pet shop</h1>
+      <p class="lead">
+        Choose a product size to see its price. Pickup in store is the default.
+      </p>
+      <div class="menu-filter-bar" id="shop-filter-bar"></div>
+      <div class="product-grid" id="shop-root">
+        <p class="lead">Loading products…</p>
+      </div>
+    </main>
+    <footer id="site-footer"></footer>
+    <script src="/js/chrome.js"></script>
+    <script type="module">
+      import { api } from '/js/api.js';
+
+      mountChrome();
+
+      const root = document.getElementById('shop-root');
+      const filterBar = document.getElementById('shop-filter-bar');
+      let selectedCategory = '';
+      const selectedVariantByProduct = {};
+
+      function money(value) {
+        return `$${Number(value).toFixed(2)}`;
+      }
+
+      function variantMarkup(product) {
+        const variants = Array.isArray(product.variants) ? product.variants : [];
+        if (!variants.length) {
+          return `<p class="price">${money(product.price)}</p>`;
+        }
+
+        const selectedId =
+          selectedVariantByProduct[product.id] || variants[0].id;
+        const selected =
+          variants.find((variant) => variant.id === selectedId) || variants[0];
+        const cheapest = Math.min(...variants.map((variant) => Number(variant.price)));
+        const diff = Number(selected.price) - cheapest;
+
+        return `
+          <div class="size-picker" data-product="${product.id}">
+            <p class="size-label">Choose size</p>
+            <div class="size-options">
+              ${variants
+                .map(
+                  (variant) => `<button
+                    type="button"
+                    class="size-option ${variant.id === selected.id ? 'active' : ''}"
+                    data-variant="${variant.id}"
+                  >
+                    <strong>${variant.name}</strong>
+                    <span>${money(variant.price)}</span>
+                  </button>`,
+                )
+                .join('')}
+            </div>
+            <p class="price selected-price">${money(selected.price)}</p>
+            <p class="variant-diff">
+              ${
+                diff > 0
+                  ? `${money(diff)} more than the smaller size`
+                  : 'Best entry price'
+              }
+            </p>
+          </div>
+        `;
+      }
+
+      function bindSizePickers() {
+        root.querySelectorAll('.size-picker').forEach((picker) => {
+          const productId = picker.dataset.product;
+          picker.querySelectorAll('.size-option').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              selectedVariantByProduct[productId] = btn.dataset.variant;
+              render();
+            });
+          });
+        });
+      }
+
+      function renderProducts(products) {
+        const visible = selectedCategory
+          ? products.filter((product) => product.category === selectedCategory)
+          : products;
+
+        root.innerHTML = visible
+          .map((product) => {
+            const totalStock = product.variants?.length
+              ? product.variants.reduce(
+                  (sum, variant) => sum + Number(variant.stockQty || 0),
+                  0,
+                )
+              : Number(product.stockQty || 0);
+            return `<article class="product">
+              <div class="product-media" aria-hidden="true"></div>
+              <h2>${product.name}</h2>
+              <p class="meta">${product.category.replaceAll('_', ' ')} · ${
+                totalStock > 0 ? 'In stock' : 'Out of stock'
+              }</p>
+              ${variantMarkup(product)}
+            </article>`;
+          })
+          .join('');
+
+        bindSizePickers();
+      }
+
+      let allProducts = [];
+
+      function render() {
+        renderProducts(allProducts);
+      }
+
+      try {
+        allProducts = await api('/products');
+        if (!allProducts.length) {
+          root.innerHTML = '<p class="lead">Products coming soon.</p>';
+        } else {
+          const categories = [
+            ...new Set(allProducts.map((product) => product.category)),
+          ];
+
+          filterBar.innerHTML = [
+            `<button type="button" class="menu-chip active" data-category="">All</button>`,
+            ...categories.map(
+              (category) =>
+                `<button type="button" class="menu-chip" data-category="${category}">${category.replaceAll('_', ' ')}</button>`,
+            ),
+          ].join('');
+
+          filterBar.querySelectorAll('[data-category]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              selectedCategory = btn.dataset.category;
+              filterBar.querySelectorAll('.menu-chip').forEach((chip) => {
+                chip.classList.toggle('active', chip === btn);
+              });
+              render();
+            });
+          });
+
+          render();
+        }
+      } catch (err) {
+        root.innerHTML = `<p class="lead">Could not load products: ${err.message}</p>`;
+      }
+    </script>
+  </body>
+</html>

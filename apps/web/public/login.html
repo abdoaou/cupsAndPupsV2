@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Log in · Cups &amp; Pups</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <header id="site-header"></header>
+    <main class="page">
+      <h1>Log in</h1>
+      <form class="form" id="login-form">
+        <label>
+          Email
+          <input type="email" name="email" required autocomplete="email" />
+        </label>
+        <label>
+          Password
+          <input
+            type="password"
+            name="password"
+            required
+            minlength="8"
+            autocomplete="current-password"
+          />
+        </label>
+        <p class="form-error" id="login-error" hidden></p>
+        <button class="btn btn-espresso" type="submit">Sign in</button>
+      </form>
+      <p class="form-note">
+        New here? <a href="/register">Create an account</a>
+      </p>
+    </main>
+    <footer id="site-footer"></footer>
+    <script src="/js/chrome.js"></script>
+    <script type="module">
+      import { api, saveTokens, saveUser } from '/js/api.js';
+
+      mountChrome();
+
+      const form = document.getElementById('login-form');
+      const errorEl = document.getElementById('login-error');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        errorEl.hidden = true;
+        const button = form.querySelector('button');
+        button.disabled = true;
+        button.textContent = 'Signing in…';
+
+        const data = Object.fromEntries(new FormData(form).entries());
+
+        try {
+          const result = await api('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify(data),
+          });
+          saveTokens(result);
+          if (result.user) saveUser(result.user);
+          window.location.href = '/account';
+        } catch (err) {
+          errorEl.textContent = err.message || 'Login failed';
+          errorEl.hidden = false;
+          button.disabled = false;
+          button.textContent = 'Sign in';
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Account · Cups &amp; Pups</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <header id="site-header"></header>
+    <main class="page">
+      <h1>Your account</h1>
+      <p class="lead" id="account-lead">
+        One profile for pets, bookings, orders, and loyalty across the café,
+        shop, and grooming floor.
+      </p>
+
+      <div class="actions" id="account-actions">
+        <a class="btn btn-espresso" href="/login">Log in</a>
+        <a class="btn btn-outline" href="/register">Create account</a>
+      </div>
+
+      <section class="my-bookings-panel" aria-labelledby="my-bookings-title">
+        <div class="my-bookings-head">
+          <h2 id="my-bookings-title">My grooming calendar</h2>
+          <p id="my-bookings-source">Loading your appointments…</p>
+        </div>
+        <div class="my-bookings-list" id="my-bookings-list"></div>
+        <p class="form-note">
+          Need another scrub? <a href="/book">Book grooming</a>
+        </p>
+      </section>
+    </main>
+    <footer id="site-footer"></footer>
+    <script src="/js/chrome.js"></script>
+    <script type="module">
+      import { api, clearAuth, saveUser } from '/js/api.js';
+      import {
+        clearPastGuestBookings,
+        getGuestBookings,
+        isLoggedIn,
+        mergeBookings,
+        renderBookingCards,
+      } from '/js/guest-bookings.js';
+
+      mountChrome();
+
+      const leadEl = document.getElementById('account-lead');
+      const actionsEl = document.getElementById('account-actions');
+      const sourceEl = document.getElementById('my-bookings-source');
+      const listEl = document.getElementById('my-bookings-list');
+
+      async function loadLoggedInBookings() {
+        const profile = await api('/me');
+        saveUser(profile);
+        leadEl.textContent = `Hi ${profile.firstName} — here are your saved grooming times.`;
+        actionsEl.innerHTML = `
+          <a class="btn btn-espresso" href="/book">Book again</a>
+          <button type="button" class="btn btn-outline" id="logout-btn">Log out</button>
+        `;
+        document.getElementById('logout-btn').addEventListener('click', () => {
+          clearAuth();
+          window.location.href = '/account';
+        });
+
+        clearPastGuestBookings();
+        const remote = await api('/me/appointments');
+        const bookings = mergeBookings(remote, getGuestBookings());
+        sourceEl.textContent = 'Your booked dates and times';
+        listEl.innerHTML = renderBookingCards(bookings, {
+          emptyText: 'No grooming bookings yet.',
+        });
+      }
+
+      function loadGuestBookings() {
+        clearPastGuestBookings();
+        const bookings = getGuestBookings();
+        leadEl.textContent =
+          'Not logged in — we keep your recent grooming bookings on this device.';
+        sourceEl.textContent = 'Saved on this browser — date & time';
+        listEl.innerHTML = renderBookingCards(bookings, {
+          emptyText:
+            'No local bookings yet. Book a grooming session and it will show up here.',
+        });
+      }
+
+      (async () => {
+        try {
+          if (isLoggedIn()) {
+            await loadLoggedInBookings();
+          } else {
+            loadGuestBookings();
+          }
+        } catch (err) {
+          if (isLoggedIn()) {
+            clearAuth();
+          }
+          sourceEl.textContent = err.message || 'Could not load account bookings';
+          loadGuestBookings();
+        }
+      })();
+    </script>
+  </body>
+</html>

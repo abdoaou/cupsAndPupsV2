@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin dashboard · Cups &amp; Pups</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div class="admin-shell">
+      <header class="admin-top">
+        <div class="admin-brand">
+          Cups &amp; Pups
+          <span>Owner dashboard</span>
+        </div>
+        <nav class="admin-nav" id="admin-nav"></nav>
+        <div class="admin-who-row">
+          <span id="admin-who"></span>
+          <button class="btn btn-ghost btn-sm" id="admin-logout" type="button">
+            Log out
+          </button>
+        </div>
+      </header>
+
+      <div class="page-head">
+        <div>
+          <h1>Today at a glance</h1>
+          <p>Booking totals, confirmations, stock, and store pulse.</p>
+        </div>
+      </div>
+
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi"><div class="label">Loading…</div></div>
+      </div>
+
+      <div class="grid-2">
+        <section class="panel">
+          <h2>Upcoming bookings</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>When</th>
+                  <th>Pet / Customer</th>
+                  <th>Service</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="upcoming-body">
+                <tr>
+                  <td colspan="4" class="empty">Loading…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Low stock</h2>
+          <div id="low-stock">Loading…</div>
+        </section>
+      </div>
+    </div>
+
+    <script type="module">
+      import { api } from '/js/api.js';
+      import {
+        requireAdmin,
+        mountAdminChrome,
+        formatMoney,
+        formatWhen,
+        statusClass,
+        showAdminLoadError,
+      } from '/js/admin.js';
+
+      const user = await requireAdmin({ dashboard: true });
+      if (!user) throw new Error('redirect');
+      mountAdminChrome('dashboard');
+
+      try {
+        const data = await api('/admin/dashboard');
+        const kpis = data.kpis || {};
+
+        document.getElementById('kpi-grid').innerHTML = `
+          <div class="kpi"><div class="label">Booking total · this week</div><div class="value">${formatMoney(kpis.bookingAmountWeek)}</div><div class="muted">${kpis.bookingsThisWeek || 0} bookings</div></div>
+          <div class="kpi"><div class="label">Booking total · this month</div><div class="value">${formatMoney(kpis.bookingAmountMonth)}</div><div class="muted">${kpis.bookingsThisMonth || 0} bookings</div></div>
+          <div class="kpi"><div class="label">Pending bookings</div><div class="value">${kpis.pendingCount ?? 0}</div></div>
+          <div class="kpi"><div class="label">Confirmed bookings</div><div class="value">${kpis.confirmedCount ?? 0}</div></div>
+          <div class="kpi"><div class="label">Appointments today</div><div class="value">${kpis.appointmentsToday ?? 0}</div></div>
+          <div class="kpi"><div class="label">Upcoming (7 days)</div><div class="value">${kpis.appointmentsUpcoming ?? 0}</div></div>
+          <div class="kpi"><div class="label">Revenue today</div><div class="value">${formatMoney(kpis.revenueToday)}</div></div>
+          <div class="kpi"><div class="label">Low stock items</div><div class="value">${kpis.lowStockCount ?? 0}</div></div>
+        `;
+
+        const body = document.getElementById('upcoming-body');
+        if (!data.upcomingAppointments?.length) {
+          body.innerHTML =
+            '<tr><td colspan="4" class="empty">No upcoming bookings yet.</td></tr>';
+        } else {
+          body.innerHTML = data.upcomingAppointments
+            .map((a) => {
+              const who = `${a.pet?.name || 'Pet'} · ${a.customer?.firstName || ''} ${a.customer?.lastName || ''}`;
+              return `<tr>
+                <td>${formatWhen(a.startTime)}</td>
+                <td>${who}<div class="muted">${a.pet?.breed || a.pet?.species || ''}</div></td>
+                <td>${(a.services || []).join(', ') || '—'}</td>
+                <td><span class="${statusClass(a.status)}">${a.status}</span></td>
+              </tr>`;
+            })
+            .join('');
+        }
+
+        const low = document.getElementById('low-stock');
+        if (!data.lowStockProducts?.length) {
+          low.innerHTML = '<p class="empty">All stocked up.</p>';
+        } else {
+          low.innerHTML = `<div class="table-wrap"><table>
+            <thead><tr><th>Product</th><th>Stock</th></tr></thead>
+            <tbody>
+              ${data.lowStockProducts
+                .map(
+                  (p) => `<tr>
+                    <td>${p.name}<div class="muted">${p.sku || ''}</div></td>
+                    <td class="stock-low">${p.stockQty} / ${p.lowStockThreshold}</td>
+                  </tr>`,
+                )
+                .join('')}
+            </tbody>
+          </table></div>`;
+        }
+      } catch (err) {
+        showAdminLoadError(
+          [
+            document.getElementById('kpi-grid'),
+            document.getElementById('upcoming-body'),
+            document.getElementById('low-stock'),
+          ],
+          err,
+        );
+      }
+    </script>
+  </body>
+</html>

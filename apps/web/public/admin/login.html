@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin login · Cups &amp; Pups</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div class="login-card">
+      <h1>Staff login</h1>
+      <p>Dashboard &amp; product tools for Cups &amp; Pups.</p>
+      <form id="admin-login-form" class="form-grid">
+        <label>
+          Email
+          <input
+            type="email"
+            name="email"
+            required
+            value="owner@cupsandpups.local"
+            autocomplete="username"
+          />
+        </label>
+        <label>
+          Password
+          <input
+            type="password"
+            name="password"
+            required
+            minlength="8"
+            value="Password123!"
+            autocomplete="current-password"
+          />
+        </label>
+        <p class="error" id="login-error" hidden></p>
+        <button class="btn btn-primary" type="submit">Sign in</button>
+      </form>
+    </div>
+    <script type="module">
+      import {
+        api,
+        saveTokens,
+        saveUser,
+        canManageProducts,
+        canManageMenu,
+        canViewDashboard,
+      } from '/js/api.js';
+
+      const form = document.getElementById('admin-login-form');
+      const errorEl = document.getElementById('login-error');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        errorEl.hidden = true;
+        const button = form.querySelector('button');
+        button.disabled = true;
+        button.textContent = 'Signing in…';
+
+        const data = Object.fromEntries(new FormData(form).entries());
+        try {
+          const result = await api('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify(data),
+          });
+          saveTokens(result);
+          saveUser(result.user);
+
+          if (canViewDashboard(result.user)) {
+            window.location.href = '/admin';
+          } else if (canManageMenu(result.user)) {
+            window.location.href = '/admin/menu';
+          } else if (canManageProducts(result.user)) {
+            window.location.href = '/admin/products';
+          } else {
+            throw new Error('This account does not have admin access');
+          }
+        } catch (err) {
+          errorEl.textContent = err.message || 'Login failed';
+          errorEl.hidden = false;
+          button.disabled = false;
+          button.textContent = 'Sign in';
+        }
+      });
+    </script>
+  </body>
+</html>

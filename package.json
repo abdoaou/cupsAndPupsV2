@@ -1,0 +1,23 @@
+{
+  "name": "cups-and-pups",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:api": "npm run dev -w @cups-and-pups/api",
+    "dev:web": "npm run dev -w @cups-and-pups/web",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "db:generate": "npm run prisma:generate -w @cups-and-pups/api",
+    "db:migrate": "npm run prisma:migrate -w @cups-and-pups/api",
+    "db:seed": "npm run prisma:seed -w @cups-and-pups/api",
+    "db:studio": "npm run prisma:studio -w @cups-and-pups/api"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

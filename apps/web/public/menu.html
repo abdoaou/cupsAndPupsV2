@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Café Menu · Cups &amp; Pups</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <header id="site-header"></header>
+    <main class="page">
+      <h1>Café menu</h1>
+      <p class="lead">
+        Pick a category, then choose Small or Large on drinks to see the price.
+      </p>
+      <div class="menu-filter-bar" id="menu-filter-bar"></div>
+      <div id="menu-root">
+        <p class="lead">Loading menu…</p>
+      </div>
+    </main>
+    <footer id="site-footer"></footer>
+    <script src="/js/chrome.js"></script>
+    <script type="module">
+      import { api } from '/js/api.js';
+
+      mountChrome();
+
+      const labels = {
+        COFFEE: 'Hot coffee',
+        BEVERAGES: 'Iced & cold drinks',
+        FOOD: 'Food & desserts',
+        PET_TREATS: 'Pet-friendly treats',
+        SPECIALS: 'Signature & add-ons',
+      };
+
+      const root = document.getElementById('menu-root');
+      const filterBar = document.getElementById('menu-filter-bar');
+      let selectedCategory = '';
+      const selectedSizeByItem = {};
+
+      function money(value) {
+        return `$${Number(value).toFixed(2)}`;
+      }
+
+      function itemPriceMarkup(item) {
+        const variants = (item.variants || []).filter((v) => v.isActive !== false);
+        if (!variants.length) {
+          return `<strong>${money(item.price)}</strong>`;
+        }
+
+        const selectedId = selectedSizeByItem[item.id] || variants[0].id;
+        const selected =
+          variants.find((variant) => variant.id === selectedId) || variants[0];
+        const cheapest = Math.min(...variants.map((variant) => Number(variant.price)));
+        const diff = Number(selected.price) - cheapest;
+
+        return `<div class="menu-size-picker" data-item="${item.id}">
+          <div class="size-options menu-size-options">
+            ${variants
+              .map(
+                (variant) => `<button
+                  type="button"
+                  class="size-option ${variant.id === selected.id ? 'active' : ''}"
+                  data-variant="${variant.id}"
+                >
+                  <strong>${variant.name}</strong>
+                  <span>${money(variant.price)}</span>
+                </button>`,
+              )
+              .join('')}
+          </div>
+          <strong class="menu-selected-price">${money(selected.price)}</strong>
+          <small class="variant-diff">
+            ${diff > 0 ? `${money(diff)} more than Small` : 'Best entry price'}
+          </small>
+        </div>`;
+      }
+
+      function bindSizePickers(groups, order, renderMenu) {
+        root.querySelectorAll('.menu-size-picker').forEach((picker) => {
+          const itemId = picker.dataset.item;
+          picker.querySelectorAll('.size-option').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              selectedSizeByItem[itemId] = btn.dataset.variant;
+              renderMenu();
+            });
+          });
+        });
+      }
+
+      try {
+        const items = await api('/menu');
+        if (!items.length) {
+          root.innerHTML = '<p class="lead">Menu coming soon.</p>';
+        } else {
+          const preferred = ['COFFEE', 'BEVERAGES', 'SPECIALS', 'FOOD', 'PET_TREATS'];
+          const groups = {};
+          for (const item of items) {
+            (groups[item.category] ||= []).push(item);
+          }
+          const fromDb = Object.keys(groups);
+          const order = [
+            ...preferred.filter((key) => fromDb.includes(key)),
+            ...fromDb.filter((key) => !preferred.includes(key)).sort(),
+          ];
+
+          filterBar.innerHTML = [
+            `<button type="button" class="menu-chip active" data-category="">All</button>`,
+            ...order.map(
+              (key) =>
+                `<button type="button" class="menu-chip" data-category="${key}">${labels[key] || key.replaceAll('_', ' ')}</button>`,
+            ),
+          ].join('');
+
+          const renderMenu = () => {
+            const visibleOrder = selectedCategory
+              ? order.filter((key) => key === selectedCategory)
+              : order;
+            root.innerHTML = visibleOrder
+              .map((key) => {
+                const rows = groups[key]
+                  .map(
+                    (item) => `<li class="menu-item-row">
+                      <div class="menu-item-copy">
+                        <span>${item.name}${item.isPetFriendly ? ' · pet-friendly' : ''}</span>
+                        ${
+                          item.description
+                            ? `<small>${item.description}</small>`
+                            : ''
+                        }
+                      </div>
+                      ${itemPriceMarkup(item)}
+                    </li>`,
+                  )
+                  .join('');
+                return `<section class="menu-block">
+                  <h2>${labels[key] || key.replaceAll('_', ' ')}</h2>
+                  <ul>${rows}</ul>
+                </section>`;
+              })
+              .join('');
+            bindSizePickers(groups, order, renderMenu);
+          };
+
+          renderMenu();
+
+          filterBar.querySelectorAll('[data-category]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              selectedCategory = btn.dataset.category;
+              filterBar.querySelectorAll('.menu-chip').forEach((chip) => {
+                chip.classList.toggle('active', chip === btn);
+              });
+              renderMenu();
+            });
+          });
+        }
+      } catch (err) {
+        root.innerHTML = `<p class="lead">Could not load menu: ${err.message}</p>`;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bookings · Cups &amp; Pups Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div class="admin-shell">
+      <header class="admin-top">
+        <div class="admin-brand">
+          Cups &amp; Pups
+          <span>Bookings</span>
+        </div>
+        <nav class="admin-nav" id="admin-nav"></nav>
+        <div class="admin-who-row">
+          <span id="admin-who"></span>
+          <button class="btn btn-ghost btn-sm" id="admin-logout" type="button">
+            Log out
+          </button>
+        </div>
+      </header>
+
+      <div class="page-head">
+        <div>
+          <h1>Booking board</h1>
+          <p>Confirm, filter, and add grooming appointments.</p>
+        </div>
+        <button class="btn btn-primary" id="add-booking-btn" type="button">
+          Add booking
+        </button>
+      </div>
+
+      <div class="toolbar">
+        <select id="status-filter">
+          <option value="">All statuses</option>
+          <option>PENDING</option>
+          <option>CONFIRMED</option>
+          <option>CHECKED_IN</option>
+          <option>IN_PROGRESS</option>
+          <option>COMPLETED</option>
+          <option>CANCELLED</option>
+          <option>NO_SHOW</option>
+        </select>
+        <select id="sort-filter">
+          <option value="latest">Latest → oldest</option>
+          <option value="oldest">Oldest → latest</option>
+        </select>
+        <button class="btn btn-ghost" id="refresh-btn" type="button">Refresh</button>
+      </div>
+
+      <section class="panel" id="add-panel" hidden>
+        <h2>Add booking</h2>
+        <form id="add-form" class="form-grid two">
+          <label>
+            Customer name
+            <input name="customerName" required minlength="2" />
+          </label>
+          <label>
+            Phone
+            <input name="phone" type="tel" required placeholder="+961..." />
+          </label>
+          <label>
+            Pet name
+            <input name="petName" required />
+          </label>
+          <label>
+            Service
+            <select name="serviceKey" id="service-key" required></select>
+          </label>
+          <label>
+            Start date &amp; time
+            <input name="startLocal" type="datetime-local" required />
+          </label>
+          <label>
+            Status
+            <select name="status">
+              <option value="CONFIRMED">CONFIRMED</option>
+              <option value="PENDING">PENDING</option>
+            </select>
+          </label>
+          <label class="checkbox-row">
+            <input name="addNailCutting" type="checkbox" />
+            Add nail cutting (+$2)
+          </label>
+          <label style="grid-column: 1 / -1">
+            Notes
+            <textarea name="notes"></textarea>
+          </label>
+          <p class="error" id="add-error" hidden style="grid-column: 1 / -1"></p>
+          <div class="form-actions" style="grid-column: 1 / -1">
+            <button class="btn btn-primary" type="submit">Save booking</button>
+            <button class="btn btn-ghost" id="cancel-add" type="button">Cancel</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Customer</th>
+                <th>Pet</th>
+                <th>Services</th>
+                <th>Staff</th>
+                <th>Status</th>
+                <th>Price</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-body">
+              <tr>
+                <td colspan="7" class="empty">Loading…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <script type="module">
+      import { api } from '/js/api.js';
+      import {
+        requireAdmin,
+        mountAdminChrome,
+        formatMoney,
+        formatWhen,
+        statusClass,
+        showAdminLoadError,
+      } from '/js/admin.js';
+
+      const user = await requireAdmin({ dashboard: true });
+      if (!user) throw new Error('redirect');
+      mountAdminChrome('bookings');
+
+      const body = document.getElementById('bookings-body');
+      const statusFilter = document.getElementById('status-filter');
+      const sortFilter = document.getElementById('sort-filter');
+      const addPanel = document.getElementById('add-panel');
+      const addForm = document.getElementById('add-form');
+      const addError = document.getElementById('add-error');
+      const serviceKey = document.getElementById('service-key');
+
+      const STATUSES = [
+        'PENDING',
+        'CONFIRMED',
+        'CHECKED_IN',
+        'IN_PROGRESS',
+        'COMPLETED',
+        'CANCELLED',
+        'NO_SHOW',
+      ];
+
+      async function loadCatalog() {
+        const items = await api('/bookings/catalog');
+        serviceKey.innerHTML = items
+          .map(
+            (item) =>
+              `<option value="${item.key}">${item.label} · $${item.price} · ${item.durationMinutes}m</option>`,
+          )
+          .join('');
+      }
+
+      async function load() {
+        try {
+          const status = statusFilter.value;
+          const sort = sortFilter.value;
+          const params = new URLSearchParams();
+          if (status) params.set('status', status);
+          if (sort) params.set('sort', sort);
+          const query = params.toString() ? `?${params}` : '';
+          const rows = await api(`/admin/appointments${query}`);
+          if (!rows.length) {
+            body.innerHTML =
+              '<tr><td colspan="7" class="empty">No appointments found.</td></tr>';
+            return;
+          }
+          body.innerHTML = rows
+            .map((a) => {
+              const options = STATUSES.map(
+                (s) =>
+                  `<option value="${s}" ${s === a.status ? 'selected' : ''}>${s}</option>`,
+              ).join('');
+              return `<tr data-id="${a.id}">
+              <td>${formatWhen(a.startTime)}</td>
+              <td>${a.customer?.firstName || ''} ${a.customer?.lastName || ''}
+                <div class="muted">${a.customer?.phone || a.customer?.email || ''}</div>
+              </td>
+              <td>${a.pet?.name || '—'}
+                <div class="muted">${a.pet?.breed || a.pet?.species || ''}</div>
+              </td>
+              <td>${(a.services || []).join(', ') || '—'}</td>
+              <td>${a.staff || '—'}</td>
+              <td>
+                <select class="status-edit" data-id="${a.id}" aria-label="Update status">
+                  ${options}
+                </select>
+                <div class="muted"><span class="${statusClass(a.status)}">${a.status}</span></div>
+              </td>
+              <td>${a.priceCharged == null ? '—' : formatMoney(a.priceCharged)}</td>
+            </tr>`;
+            })
+            .join('');
+
+          body.querySelectorAll('.status-edit').forEach((select) => {
+            select.addEventListener('change', async () => {
+              select.disabled = true;
+              try {
+                await api(`/admin/appointments/${select.dataset.id}`, {
+                  method: 'PATCH',
+                  body: JSON.stringify({ status: select.value }),
+                });
+                await load();
+              } catch (err) {
+                alert(err.message || 'Could not update status');
+                select.disabled = false;
+              }
+            });
+          });
+        } catch (err) {
+          showAdminLoadError(body, err);
+        }
+      }
+
+      document.getElementById('add-booking-btn').addEventListener('click', () => {
+        addPanel.hidden = false;
+        addPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      document.getElementById('cancel-add').addEventListener('click', () => {
+        addPanel.hidden = true;
+        addError.hidden = true;
+        addForm.reset();
+      });
+
+      addForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        addError.hidden = true;
+        const raw = Object.fromEntries(new FormData(addForm).entries());
+        const [petSize, serviceType] = String(raw.serviceKey).split(':');
+        const startTime = new Date(raw.startLocal);
+        if (Number.isNaN(startTime.getTime())) {
+          addError.hidden = false;
+          addError.textContent = 'Pick a valid date and time';
+          return;
+        }
+
+        const button = addForm.querySelector('button[type="submit"]');
+        button.disabled = true;
+        button.textContent = 'Saving…';
+        try {
+          await api('/admin/appointments', {
+            method: 'POST',
+            body: JSON.stringify({
+              customerName: raw.customerName,
+              petName: raw.petName,
+              phone: raw.phone,
+              startTime: startTime.toISOString(),
+              petSize,
+              serviceType,
+              addNailCutting: Boolean(raw.addNailCutting),
+              notes: raw.notes || undefined,
+              status: raw.status,
+            }),
+          });
+          addPanel.hidden = true;
+          addForm.reset();
+          await load();
+        } catch (err) {
+          addError.hidden = false;
+          addError.textContent = err.message || 'Could not create booking';
+        } finally {
+          button.disabled = false;
+          button.textContent = 'Save booking';
+        }
+      });
+
+      statusFilter.addEventListener('change', load);
+      sortFilter.addEventListener('change', load);
+      document.getElementById('refresh-btn').addEventListener('click', load);
+
+      try {
+        await loadCatalog();
+        await load();
+      } catch (err) {
+        showAdminLoadError(body, err);
+      }
+    </script>
+  </body>
+</html>

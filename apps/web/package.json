@@ -1,0 +1,12 @@
+{
+  "name": "@cups-and-pups/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Products · Cups &amp; Pups Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div class="admin-shell">
+      <header class="admin-top">
+        <div class="admin-brand">
+          Cups &amp; Pups
+          <span>Products</span>
+        </div>
+        <nav class="admin-nav" id="admin-nav"></nav>
+        <div class="admin-who-row">
+          <span id="admin-who"></span>
+          <button class="btn btn-ghost btn-sm" id="admin-logout" type="button">
+            Log out
+          </button>
+        </div>
+      </header>
+
+      <div class="page-head">
+        <div>
+          <h1>Product catalog</h1>
+          <p>Create, edit, and deactivate retail products.</p>
+        </div>
+        <button class="btn btn-primary" id="new-product-btn" type="button">
+          Add product
+        </button>
+      </div>
+
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="Search name, SKU, brand" />
+        <select id="category-filter">
+          <option value="">All categories</option>
+        </select>
+        <label class="checkbox-row">
+          <input id="include-inactive" type="checkbox" />
+          Show inactive
+        </label>
+      </div>
+
+      <section class="panel" id="editor-panel" hidden>
+        <h2 id="editor-title">New product</h2>
+        <form id="product-form" class="form-grid two">
+          <input type="hidden" name="id" />
+          <label>
+            Name
+            <input name="name" required />
+          </label>
+          <label>
+            Category
+            <select name="category" required id="category-select">
+            </select>
+          </label>
+          <label>
+            Price
+            <input name="price" type="number" min="0" step="0.01" required />
+          </label>
+          <label>
+            Stock qty
+            <input name="stockQty" type="number" min="0" step="1" value="0" />
+          </label>
+          <label>
+            Low stock at
+            <input
+              name="lowStockThreshold"
+              type="number"
+              min="0"
+              step="1"
+              value="5"
+            />
+          </label>
+          <label>
+            SKU
+            <input name="sku" />
+          </label>
+          <label>
+            Brand
+            <input name="brand" />
+          </label>
+          <label>
+            Pet type
+            <input name="petType" placeholder="dog / cat / both" />
+          </label>
+          <label style="grid-column: 1 / -1">
+            Description
+            <textarea name="description"></textarea>
+          </label>
+          <label class="checkbox-row">
+            <input name="isActive" type="checkbox" checked />
+            Active
+          </label>
+          <label class="checkbox-row">
+            <input name="isFeatured" type="checkbox" />
+            Featured
+          </label>
+          <div class="variant-editor" style="grid-column: 1 / -1">
+            <div class="variant-editor-head">
+              <strong>Product variants / sizes</strong>
+              <button class="btn btn-ghost btn-sm" id="add-variant-btn" type="button">
+                Add variant
+              </button>
+            </div>
+            <div class="variant-list-admin" id="variant-list"></div>
+            <p class="muted">Use this for the 2 sizes and their different prices.</p>
+          </div>
+          <p class="error" id="form-error" hidden style="grid-column: 1 / -1"></p>
+          <div class="form-actions" style="grid-column: 1 / -1">
+            <button class="btn btn-primary" type="submit">Save</button>
+            <button class="btn btn-ghost" id="cancel-edit" type="button">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price / sizes</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="products-body">
+              <tr>
+                <td colspan="6" class="empty">Loading…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <script type="module">
+      import { api } from '/js/api.js';
+      import {
+        requireAdmin,
+        mountAdminChrome,
+        formatMoney,
+        showAdminLoadError,
+      } from '/js/admin.js';
+
+      const user = await requireAdmin({ products: true });
+      if (!user) throw new Error('redirect');
+      mountAdminChrome('products');
+
+      const body = document.getElementById('products-body');
+      const editor = document.getElementById('editor-panel');
+      const form = document.getElementById('product-form');
+      const formError = document.getElementById('form-error');
+      const search = document.getElementById('search');
+      const categoryFilter = document.getElementById('category-filter');
+      const includeInactive = document.getElementById('include-inactive');
+      const categorySelect = form.elements.category;
+      const variantList = document.getElementById('variant-list');
+      const addVariantBtn = document.getElementById('add-variant-btn');
+
+      function renderVariantRows(variants = []) {
+        const items = variants.length ? variants : [{ name: '', sku: '', price: '', stockQty: 0, isActive: true }];
+        variantList.innerHTML = items
+          .map(
+            (variant, index) => `<div class="variant-row-admin" data-idx="${index}">
+              <input type="hidden" name="variantId" value="${variant.id || ''}" />
+              <label>
+                Size name
+                <input name="variantName" value="${variant.name || ''}" placeholder="Small bag / Large bag" />
+              </label>
+              <label>
+                SKU
+                <input name="variantSku" value="${variant.sku || ''}" />
+              </label>
+              <label>
+                Price
+                <input name="variantPrice" type="number" min="0" step="0.01" value="${variant.price ?? ''}" />
+              </label>
+              <label>
+                Stock
+                <input name="variantStockQty" type="number" min="0" step="1" value="${variant.stockQty ?? 0}" />
+              </label>
+              <label class="checkbox-row">
+                <input name="variantIsActive" type="checkbox" ${variant.isActive !== false ? 'checked' : ''} />
+                Active
+              </label>
+              <button class="btn btn-danger btn-sm variant-remove" type="button">Delete</button>
+            </div>`,
+          )
+          .join('');
+
+        variantList.querySelectorAll('.variant-remove').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            btn.closest('.variant-row-admin')?.remove();
+            if (!variantList.children.length) renderVariantRows();
+          });
+        });
+      }
+
+      function fillCategoryOptions(categories) {
+        const filterKeep = categoryFilter.value;
+        categoryFilter.innerHTML =
+          '<option value="">All categories</option>' +
+          categories.map((c) => `<option value="${c}">${c}</option>`).join('');
+        categoryFilter.value = filterKeep;
+        categorySelect.innerHTML = categories
+          .map((c) => `<option value="${c}">${c}</option>`)
+          .join('');
+      }
+
+      async function loadCategories() {
+        const data = await api('/admin/categories');
+        fillCategoryOptions(data.products);
+      }
+
+      function openEditor(product) {
+        editor.hidden = false;
+        formError.hidden = true;
+        document.getElementById('editor-title').textContent = product
+          ? 'Edit product'
+          : 'New product';
+        form.reset();
+        form.elements.isActive.checked = true;
+        if (product) {
+          form.elements.id.value = product.id;
+          form.elements.name.value = product.name || '';
+          form.elements.category.value = product.category;
+          form.elements.price.value = product.price;
+          form.elements.stockQty.value = product.stockQty;
+          form.elements.lowStockThreshold.value = product.lowStockThreshold;
+          form.elements.sku.value = product.sku || '';
+          form.elements.brand.value = product.brand || '';
+          form.elements.petType.value = product.petType || '';
+          form.elements.description.value = product.description || '';
+          form.elements.isActive.checked = !!product.isActive;
+          form.elements.isFeatured.checked = !!product.isFeatured;
+          renderVariantRows(product.variants || []);
+        } else {
+          form.elements.id.value = '';
+          renderVariantRows();
+        }
+        editor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function closeEditor() {
+        editor.hidden = true;
+        form.reset();
+        variantList.innerHTML = '';
+      }
+
+      async function loadProducts() {
+        try {
+          const params = new URLSearchParams();
+          if (search.value.trim()) params.set('search', search.value.trim());
+          if (categoryFilter.value) params.set('category', categoryFilter.value);
+          if (includeInactive.checked) params.set('includeInactive', 'true');
+          const qs = params.toString() ? `?${params}` : '';
+          const products = await api(`/admin/products${qs}`);
+
+          if (!products.length) {
+            body.innerHTML =
+              '<tr><td colspan="6" class="empty">No products found.</td></tr>';
+            return;
+          }
+
+          body.innerHTML = products
+            .map((p) => {
+              const variantSummary = p.variants?.length
+                ? p.variants
+                    .map((variant) => `${variant.name}: ${formatMoney(variant.price)}`)
+                    .join('<br />')
+                : formatMoney(p.price);
+              const stockTotal = p.variants?.length
+                ? p.variants.reduce((sum, variant) => sum + Number(variant.stockQty || 0), 0)
+                : p.stockQty;
+              const low = stockTotal <= p.lowStockThreshold;
+              return `<tr>
+              <td>${p.name}<div class="muted">${p.sku || p.brand || ''}</div></td>
+              <td>${p.category}</td>
+              <td>${variantSummary}</td>
+              <td class="${low ? 'stock-low' : ''}">${stockTotal}</td>
+              <td>${p.isActive ? 'Active' : 'Inactive'}</td>
+              <td class="row-actions">
+                <button class="btn btn-ghost btn-sm" data-edit="${p.id}" type="button">Edit</button>
+                ${
+                  p.isActive
+                    ? `<button class="btn btn-danger btn-sm" data-delete="${p.id}" type="button">Delete</button>`
+                    : ''
+                }
+              </td>
+            </tr>`;
+            })
+            .join('');
+
+          body.querySelectorAll('[data-edit]').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+              const product = await api(`/admin/products/${btn.dataset.edit}`);
+              openEditor(product);
+            });
+          });
+
+          body.querySelectorAll('[data-delete]').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+              if (!confirm('Delete this product from the live shop?')) return;
+              await api(`/admin/products/${btn.dataset.delete}`, {
+                method: 'DELETE',
+              });
+              await loadProducts();
+            });
+          });
+        } catch (err) {
+          showAdminLoadError(body, err);
+        }
+      }
+
+      document
+        .getElementById('new-product-btn')
+        .addEventListener('click', () => openEditor(null));
+      addVariantBtn.addEventListener('click', () => {
+        const existing = [...variantList.querySelectorAll('.variant-row-admin')].map((row) => ({
+          id: row.querySelector('[name="variantId"]').value,
+          name: row.querySelector('[name="variantName"]').value,
+          sku: row.querySelector('[name="variantSku"]').value,
+          price: row.querySelector('[name="variantPrice"]').value,
+          stockQty: row.querySelector('[name="variantStockQty"]').value,
+          isActive: row.querySelector('[name="variantIsActive"]').checked,
+        }));
+        existing.push({ name: '', sku: '', price: '', stockQty: 0, isActive: true });
+        renderVariantRows(existing);
+      });
+      document
+        .getElementById('cancel-edit')
+        .addEventListener('click', closeEditor);
+
+      let timer;
+      search.addEventListener('input', () => {
+        clearTimeout(timer);
+        timer = setTimeout(loadProducts, 250);
+      });
+      categoryFilter.addEventListener('change', loadProducts);
+      includeInactive.addEventListener('change', loadProducts);
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        formError.hidden = true;
+        const raw = Object.fromEntries(new FormData(form).entries());
+        const variants = [...variantList.querySelectorAll('.variant-row-admin')]
+          .map((row) => ({
+            id: row.querySelector('[name="variantId"]').value || undefined,
+            name: row.querySelector('[name="variantName"]').value.trim(),
+            sku: row.querySelector('[name="variantSku"]').value.trim() || undefined,
+            price: row.querySelector('[name="variantPrice"]').value,
+            stockQty: row.querySelector('[name="variantStockQty"]').value,
+            isActive: row.querySelector('[name="variantIsActive"]').checked,
+          }))
+          .filter((variant) => variant.name && variant.price !== '');
+        const payload = {
+          name: raw.name,
+          category: raw.category,
+          price: Number(raw.price),
+          stockQty: Number(raw.stockQty || 0),
+          lowStockThreshold: Number(raw.lowStockThreshold || 5),
+          sku: raw.sku || undefined,
+          brand: raw.brand || undefined,
+          petType: raw.petType || undefined,
+          description: raw.description || undefined,
+          isActive: form.elements.isActive.checked,
+          isFeatured: form.elements.isFeatured.checked,
+          variants,
+        };
+
+        try {
+          if (raw.id) {
+            await api(`/admin/products/${raw.id}`, {
+              method: 'PATCH',
+              body: JSON.stringify(payload),
+            });
+          } else {
+            await api('/admin/products', {
+              method: 'POST',
+              body: JSON.stringify(payload),
+            });
+          }
+          closeEditor();
+          await loadProducts();
+        } catch (err) {
+          formError.textContent = err.message || 'Save failed';
+          formError.hidden = false;
+        }
+      });
+
+      try {
+        await loadCategories();
+        await loadProducts();
+      } catch (err) {
+        showAdminLoadError(body, err);
+      }
+    </script>
+  </body>
+</html>

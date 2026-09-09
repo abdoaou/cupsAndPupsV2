@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Café menu · Cups &amp; Pups Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div class="admin-shell">
+      <header class="admin-top">
+        <div class="admin-brand">
+          Cups &amp; Pups
+          <span>Café menu</span>
+        </div>
+        <nav class="admin-nav" id="admin-nav"></nav>
+        <div class="admin-who-row">
+          <span id="admin-who"></span>
+          <button class="btn btn-ghost btn-sm" id="admin-logout" type="button">
+            Log out
+          </button>
+        </div>
+      </header>
+
+      <div class="page-head">
+        <div>
+          <h1>Coffee &amp; café menu</h1>
+          <p>Imported from your Railway menu — edit prices and availability here.</p>
+        </div>
+        <button class="btn btn-primary" id="new-item-btn" type="button">
+          Add item
+        </button>
+      </div>
+
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="Search menu items" />
+        <select id="category-filter">
+          <option value="">All categories</option>
+        </select>
+        <label class="checkbox-row">
+          <input id="include-unavailable" type="checkbox" />
+          Show unavailable
+        </label>
+      </div>
+
+      <section class="panel" id="editor-panel" hidden>
+        <h2 id="editor-title">New menu item</h2>
+        <form id="menu-form" class="form-grid two">
+          <input type="hidden" name="id" />
+          <label>
+            Name
+            <input name="name" required />
+          </label>
+          <label>
+            Category
+            <select name="category" required id="category-select">
+            </select>
+          </label>
+          <label>
+            Price
+            <input name="price" type="number" min="0" step="0.01" required />
+          </label>
+          <label>
+            Sort order
+            <input name="sortOrder" type="number" step="1" value="0" />
+          </label>
+          <label style="grid-column: 1 / -1">
+            Description
+            <textarea name="description"></textarea>
+          </label>
+          <label class="checkbox-row">
+            <input name="isAvailable" type="checkbox" checked />
+            Available
+          </label>
+          <label class="checkbox-row">
+            <input name="isPetFriendly" type="checkbox" />
+            Pet-friendly
+          </label>
+          <label class="checkbox-row">
+            <input name="isDailySpecial" type="checkbox" />
+            Daily special
+          </label>
+          <div class="variant-editor" style="grid-column: 1 / -1">
+            <div class="variant-editor-head">
+              <strong>Sizes (Small / Large)</strong>
+              <button class="btn btn-ghost btn-sm" id="add-menu-variant-btn" type="button">
+                Add size
+              </button>
+            </div>
+            <div class="variant-list-admin" id="menu-variant-list"></div>
+            <p class="muted">Use this for drink sizes with different prices.</p>
+          </div>
+          <p class="error" id="form-error" hidden style="grid-column: 1 / -1"></p>
+          <div class="form-actions" style="grid-column: 1 / -1">
+            <button class="btn btn-primary" type="submit">Save</button>
+            <button class="btn btn-ghost" id="cancel-edit" type="button">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Flags</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="menu-body">
+              <tr>
+                <td colspan="6" class="empty">Loading…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <script type="module">
+      import { api } from '/js/api.js';
+      import {
+        requireAdmin,
+        mountAdminChrome,
+        formatMoney,
+        showAdminLoadError,
+      } from '/js/admin.js';
+
+      const user = await requireAdmin({ menu: true });
+      if (!user) throw new Error('redirect');
+      mountAdminChrome('menu');
+
+      const body = document.getElementById('menu-body');
+      const editor = document.getElementById('editor-panel');
+      const form = document.getElementById('menu-form');
+      const formError = document.getElementById('form-error');
+      const search = document.getElementById('search');
+      const categoryFilter = document.getElementById('category-filter');
+      const includeUnavailable = document.getElementById('include-unavailable');
+      const categorySelect = form.elements.category;
+      const variantList = document.getElementById('menu-variant-list');
+      const addVariantBtn = document.getElementById('add-menu-variant-btn');
+
+      function fillCategoryOptions(categories) {
+        const filterKeep = categoryFilter.value;
+        categoryFilter.innerHTML =
+          '<option value="">All categories</option>' +
+          categories.map((c) => `<option value="${c}">${c}</option>`).join('');
+        categoryFilter.value = filterKeep;
+        categorySelect.innerHTML = categories
+          .map((c) => `<option value="${c}">${c}</option>`)
+          .join('');
+      }
+
+      async function loadCategories() {
+        const data = await api('/admin/categories');
+        fillCategoryOptions(data.menu);
+      }
+
+      function renderVariantRows(variants = []) {
+        const items = variants.length
+          ? variants
+          : [];
+        variantList.innerHTML = items.length
+          ? items
+              .map(
+                (variant, index) => `<div class="variant-row-admin" data-idx="${index}">
+              <input type="hidden" name="variantId" value="${variant.id || ''}" />
+              <label>
+                Size name
+                <input name="variantName" value="${variant.name || ''}" placeholder="Small / Large" />
+              </label>
+              <label>
+                Price
+                <input name="variantPrice" type="number" min="0" step="0.01" value="${variant.price ?? ''}" />
+              </label>
+              <label>
+                Sort
+                <input name="variantSortOrder" type="number" step="1" value="${variant.sortOrder ?? index}" />
+              </label>
+              <label class="checkbox-row">
+                <input name="variantIsActive" type="checkbox" ${variant.isActive !== false ? 'checked' : ''} />
+                Active
+              </label>
+              <button class="btn btn-danger btn-sm variant-remove" type="button">Delete</button>
+            </div>`,
+              )
+              .join('')
+          : '<p class="muted">No sizes yet. Click “Add size” for Small/Large pricing.</p>';
+
+        variantList.querySelectorAll('.variant-remove').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            btn.closest('.variant-row-admin')?.remove();
+            if (!variantList.querySelector('.variant-row-admin')) {
+              renderVariantRows([]);
+            }
+          });
+        });
+      }
+
+      function collectVariants() {
+        return [...variantList.querySelectorAll('.variant-row-admin')]
+          .map((row, index) => ({
+            id: row.querySelector('[name="variantId"]').value || undefined,
+            name: row.querySelector('[name="variantName"]').value.trim(),
+            price: row.querySelector('[name="variantPrice"]').value,
+            sortOrder: row.querySelector('[name="variantSortOrder"]').value || index,
+            isActive: row.querySelector('[name="variantIsActive"]').checked,
+          }))
+          .filter((variant) => variant.name && variant.price !== '');
+      }
+
+      function openEditor(item) {
+        editor.hidden = false;
+        formError.hidden = true;
+        document.getElementById('editor-title').textContent = item
+          ? 'Edit menu item'
+          : 'New menu item';
+        form.reset();
+        form.elements.isAvailable.checked = true;
+        if (item) {
+          form.elements.id.value = item.id;
+          form.elements.name.value = item.name || '';
+          form.elements.category.value = item.category;
+          form.elements.price.value = item.price;
+          form.elements.sortOrder.value = item.sortOrder ?? 0;
+          form.elements.description.value = item.description || '';
+          form.elements.isAvailable.checked = !!item.isAvailable;
+          form.elements.isPetFriendly.checked = !!item.isPetFriendly;
+          form.elements.isDailySpecial.checked = !!item.isDailySpecial;
+          renderVariantRows(item.variants || []);
+        } else {
+          form.elements.id.value = '';
+          renderVariantRows([
+            { name: 'Small', price: '', sortOrder: 0, isActive: true },
+            { name: 'Large', price: '', sortOrder: 1, isActive: true },
+          ]);
+        }
+        editor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function closeEditor() {
+        editor.hidden = true;
+        form.reset();
+        variantList.innerHTML = '';
+      }
+
+      async function loadMenu() {
+        try {
+          const params = new URLSearchParams();
+          if (search.value.trim()) params.set('search', search.value.trim());
+          if (categoryFilter.value) params.set('category', categoryFilter.value);
+          if (includeUnavailable.checked) params.set('includeUnavailable', 'true');
+          const qs = params.toString() ? `?${params}` : '';
+          const items = await api(`/admin/menu${qs}`);
+
+          if (!items.length) {
+            body.innerHTML =
+              '<tr><td colspan="6" class="empty">No menu items found.</td></tr>';
+            return;
+          }
+
+          body.innerHTML = items
+            .map((item) => {
+              const flags = [
+                item.isPetFriendly ? 'Pet-friendly' : null,
+                item.isDailySpecial ? 'Special' : null,
+              ]
+                .filter(Boolean)
+                .join(' · ');
+              const priceSummary = item.variants?.length
+                ? item.variants
+                    .map((variant) => `${variant.name}: ${formatMoney(variant.price)}`)
+                    .join('<br />')
+                : formatMoney(item.price);
+              return `<tr>
+              <td>${item.name}<div class="muted">${item.description || ''}</div></td>
+              <td>${item.category}</td>
+              <td>${priceSummary}</td>
+              <td class="muted">${flags || '—'}</td>
+              <td>${item.isAvailable ? 'Available' : 'Unavailable'}</td>
+              <td class="row-actions">
+                <button class="btn btn-ghost btn-sm" data-edit="${item.id}" type="button">Edit</button>
+                ${
+                  item.isAvailable
+                    ? `<button class="btn btn-danger btn-sm" data-delete="${item.id}" type="button">Delete</button>`
+                    : ''
+                }
+              </td>
+            </tr>`;
+            })
+            .join('');
+
+          body.querySelectorAll('[data-edit]').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+              const item = await api(`/admin/menu/${btn.dataset.edit}`);
+              openEditor(item);
+            });
+          });
+
+          body.querySelectorAll('[data-delete]').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+              if (!confirm('Mark this item unavailable?')) return;
+              await api(`/admin/menu/${btn.dataset.delete}`, { method: 'DELETE' });
+              await loadMenu();
+            });
+          });
+        } catch (err) {
+          showAdminLoadError(body, err);
+        }
+      }
+
+      document
+        .getElementById('new-item-btn')
+        .addEventListener('click', () => openEditor(null));
+      addVariantBtn.addEventListener('click', () => {
+        const existing = collectVariants();
+        existing.push({ name: '', price: '', sortOrder: existing.length, isActive: true });
+        renderVariantRows(existing);
+      });
+      document
+        .getElementById('cancel-edit')
+        .addEventListener('click', closeEditor);
+
+      let timer;
+      search.addEventListener('input', () => {
+        clearTimeout(timer);
+        timer = setTimeout(loadMenu, 250);
+      });
+      categoryFilter.addEventListener('change', loadMenu);
+      includeUnavailable.addEventListener('change', loadMenu);
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        formError.hidden = true;
+        const raw = Object.fromEntries(new FormData(form).entries());
+        const payload = {
+          name: raw.name,
+          category: raw.category,
+          price: Number(raw.price),
+          sortOrder: Number(raw.sortOrder || 0),
+          description: raw.description || undefined,
+          isAvailable: form.elements.isAvailable.checked,
+          isPetFriendly: form.elements.isPetFriendly.checked,
+          isDailySpecial: form.elements.isDailySpecial.checked,
+          variants: collectVariants(),
+        };
+
+        try {
+          if (raw.id) {
+            await api(`/admin/menu/${raw.id}`, {
+              method: 'PATCH',
+              body: JSON.stringify(payload),
+            });
+          } else {
+            await api('/admin/menu', {
+              method: 'POST',
+              body: JSON.stringify(payload),
+            });
+          }
+          closeEditor();
+          await loadMenu();
+        } catch (err) {
+          formError.textContent = err.message || 'Save failed';
+          formError.hidden = false;
+        }
+      });
+
+      try {
+        await loadCategories();
+        await loadMenu();
+      } catch (err) {
+        showAdminLoadError(body, err);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,752 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Book Grooming · Cups &amp; Pups</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <header id="site-header"></header>
+    <main class="page groom-page">
+      <p class="groom-kicker" aria-hidden="true">* soap bubbles included</p>
+      <h1>The scrub-a-dub menu</h1>
+      <p class="lead">
+        Tap a service, then pick a day and time.
+        Grooming runs <strong>Mon–Sat, 11:00 AM – 4:00 PM</strong>.
+      </p>
+      <p class="hours-banner" role="note">
+        Grooming · <strong>Mon–Sat · 11:00 AM – 4:00 PM</strong>
+        <span>· Sundays: coffee shop only (no grooming)</span>
+      </p>
+
+      <div class="groom-board" role="list">
+        <article class="groom-card tilt-left" role="listitem" data-size="small">
+          <div class="groom-badge">tiny tornado</div>
+          <h2><span class="paw-mark" aria-hidden="true"></span> Small dog</h2>
+          <p class="groom-blurb">Pocket rockets &amp; lap legends.</p>
+          <div class="price-pair">
+            <button
+              type="button"
+              class="price-pill"
+              data-size="small"
+              data-service="shower"
+              data-price="8"
+              data-duration="60"
+              data-label="Small dog — Shower"
+            >
+              <span class="price-label">Shower · 1h</span>
+              <span class="price-value">$8</span>
+            </button>
+            <button
+              type="button"
+              class="price-pill hot"
+              data-size="small"
+              data-service="shower_cutting"
+              data-price="15"
+              data-duration="90"
+              data-label="Small dog — Shower + cutting"
+            >
+              <span class="price-label">Shower + cut · 1h 30</span>
+              <span class="price-value">$15</span>
+            </button>
+          </div>
+        </article>
+
+        <article class="groom-card" role="listitem" data-size="medium">
+          <div class="groom-badge">mid-size menace</div>
+          <h2><span class="paw-mark" aria-hidden="true"></span> Medium dog</h2>
+          <p class="groom-blurb">Zoomies with extra volume.</p>
+          <div class="price-pair">
+            <button
+              type="button"
+              class="price-pill"
+              data-size="medium"
+              data-service="shower"
+              data-price="10"
+              data-duration="60"
+              data-label="Medium dog — Shower"
+            >
+              <span class="price-label">Shower · 1h</span>
+              <span class="price-value">$10</span>
+            </button>
+            <button
+              type="button"
+              class="price-pill hot"
+              data-size="medium"
+              data-service="shower_cutting"
+              data-price="20"
+              data-duration="90"
+              data-label="Medium dog — Shower + cutting"
+            >
+              <span class="price-label">Shower + cut · 1h 30</span>
+              <span class="price-value">$20</span>
+            </button>
+          </div>
+        </article>
+
+        <article class="groom-card tilt-right" role="listitem" data-size="large">
+          <div class="groom-badge">big softie</div>
+          <h2><span class="paw-mark" aria-hidden="true"></span> Large dog</h2>
+          <p class="groom-blurb">More fluff. More splash. More love.</p>
+          <div class="price-pair">
+            <button
+              type="button"
+              class="price-pill"
+              data-size="large"
+              data-service="shower"
+              data-price="15"
+              data-duration="60"
+              data-label="Large dog — Shower"
+            >
+              <span class="price-label">Shower · 1h</span>
+              <span class="price-value">$15</span>
+            </button>
+            <button
+              type="button"
+              class="price-pill hot"
+              data-size="large"
+              data-service="shower_cutting"
+              data-price="25"
+              data-duration="90"
+              data-label="Large dog — Shower + cutting"
+            >
+              <span class="price-label">Shower + cut · 1h 30</span>
+              <span class="price-value">$25</span>
+            </button>
+          </div>
+        </article>
+
+        <article class="groom-card cat-card" role="listitem" data-size="cat">
+          <div class="groom-badge">royal feline</div>
+          <h2><span class="whisker-mark" aria-hidden="true"></span> Cat</h2>
+          <p class="groom-blurb">We negotiate. The cat always wins.</p>
+          <div class="price-pair">
+            <button
+              type="button"
+              class="price-pill"
+              data-size="cat"
+              data-service="shower"
+              data-price="8"
+              data-duration="60"
+              data-label="Cat — Shower"
+            >
+              <span class="price-label">Shower · 1h</span>
+              <span class="price-value">$8</span>
+            </button>
+            <button
+              type="button"
+              class="price-pill hot"
+              data-size="cat"
+              data-service="shower_cutting"
+              data-price="15"
+              data-duration="90"
+              data-label="Cat — Shower + cutting"
+            >
+              <span class="price-label">Shower + cut · 1h 30</span>
+              <span class="price-value">$15</span>
+            </button>
+          </div>
+        </article>
+      </div>
+
+      <button
+        type="button"
+        class="nail-strip nail-select"
+        id="nail-addon"
+        aria-pressed="false"
+      >
+        <div class="nail-bubble">
+          <span class="nail-icon" aria-hidden="true"></span>
+          <div>
+            <strong>Add nail cutting</strong>
+            <p>Optional +$2 · tap to add or remove</p>
+          </div>
+        </div>
+        <div class="nail-price">
+          <span class="nail-only">+</span>
+          <span class="nail-amount">$2</span>
+        </div>
+      </button>
+
+      <section class="booking-panel" id="booking-panel">
+        <h2>Book this pamper session</h2>
+        <p class="booking-selected" id="booking-selected">
+          Select a shower or shower + cut above to start.
+        </p>
+
+        <section class="my-bookings-panel compact" id="saved-bookings-panel">
+          <div class="my-bookings-head">
+            <h3>Your bookings</h3>
+            <p id="saved-bookings-source">Loading your date &amp; time…</p>
+          </div>
+          <div class="my-bookings-list" id="saved-bookings-list">
+            <p class="slot-empty">Your booked date and time will show here.</p>
+          </div>
+        </section>
+
+        <form class="form booking-form" id="booking-form" hidden>
+          <div class="form-row two">
+            <label>
+              Your name
+              <input name="customerName" required minlength="2" autocomplete="name" />
+            </label>
+            <label>
+              Pet name
+              <input name="petName" required minlength="1" />
+            </label>
+          </div>
+          <div class="form-row two">
+            <label>
+              Phone number
+              <input
+                name="phone"
+                type="tel"
+                required
+                placeholder="+961..."
+                autocomplete="tel"
+              />
+            </label>
+            <label class="notes-inline">
+              Notes (optional)
+              <input name="notes" placeholder="Allergies, soft undercoat…" />
+            </label>
+          </div>
+
+          <div class="calendar-shell" aria-label="Grooming calendar">
+            <div class="cal-panel">
+              <div class="cal-head">
+                <button type="button" class="cal-nav" id="cal-prev" aria-label="Previous month">‹</button>
+                <h3 id="cal-month-label">Month</h3>
+                <button type="button" class="cal-nav" id="cal-next" aria-label="Next month">›</button>
+              </div>
+              <div class="cal-weekdays" aria-hidden="true">
+                <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+              </div>
+              <div class="cal-grid" id="cal-grid"></div>
+              <p class="cal-legend">
+                <span class="dot open"></span> Open
+                <span class="dot picked"></span> Selected
+                <span class="dot closed"></span> Sunday · coffee only
+              </p>
+              <input type="hidden" name="bookingDate" id="bookingDate" required />
+            </div>
+
+            <div class="slot-panel">
+              <div class="slot-panel-head">
+                <h3 id="slot-day-label">Pick a day</h3>
+                <p id="slot-day-meta">Grooming hours 11:00 AM – 4:00 PM</p>
+              </div>
+              <div class="slot-groups" id="slot-grid" role="listbox" aria-label="Time slots">
+                <p class="slot-empty">Select a service and a day first.</p>
+              </div>
+              <input type="hidden" name="startTime" id="startTime" />
+            </div>
+          </div>
+
+          <p class="booking-total" id="booking-total"></p>
+          <p class="form-error" id="booking-error" hidden></p>
+          <p class="booking-success" id="booking-success" hidden></p>
+          <button class="btn btn-espresso" type="submit">Confirm booking</button>
+        </form>
+      </section>
+    </main>
+    <footer id="site-footer"></footer>
+    <script src="/js/chrome.js"></script>
+    <script type="module">
+      import { api } from '/js/api.js';
+      import {
+        clearPastGuestBookings,
+        getGuestBookings,
+        isLoggedIn,
+        mergeBookings,
+        renderBookingCards,
+        saveGuestBooking,
+      } from '/js/guest-bookings.js';
+
+      mountChrome();
+
+      const OPEN_MINUTES = 11 * 60;
+      const CLOSE_MINUTES = 16 * 60;
+      const SLOT_STEP = 30;
+      const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const MONTHS = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December',
+      ];
+
+      const selectedEl = document.getElementById('booking-selected');
+      const form = document.getElementById('booking-form');
+      const errorEl = document.getElementById('booking-error');
+      const successEl = document.getElementById('booking-success');
+      const totalEl = document.getElementById('booking-total');
+      const nailBtn = document.getElementById('nail-addon');
+      const dateHidden = document.getElementById('bookingDate');
+      const startHidden = document.getElementById('startTime');
+      const slotGrid = document.getElementById('slot-grid');
+      const slotDayLabel = document.getElementById('slot-day-label');
+      const slotDayMeta = document.getElementById('slot-day-meta');
+      const calGrid = document.getElementById('cal-grid');
+      const calMonthLabel = document.getElementById('cal-month-label');
+      const savedSource = document.getElementById('saved-bookings-source');
+      const savedList = document.getElementById('saved-bookings-list');
+
+      let selection = null;
+      let addNail = false;
+      let viewYear;
+      let viewMonth;
+      let selectedDateValue = null;
+      let busyRanges = [];
+      let availabilityRequestId = 0;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      viewYear = today.getFullYear();
+      viewMonth = today.getMonth();
+
+      function pad(n) {
+        return String(n).padStart(2, '0');
+      }
+
+      function toDateValue(date) {
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+      }
+
+      function parseDateValue(value) {
+        const [y, m, d] = value.split('-').map(Number);
+        return new Date(y, m - 1, d);
+      }
+
+      function isSunday(date) {
+        return date.getDay() === 0;
+      }
+
+      function isPastDay(date) {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d < today;
+      }
+
+      function nextOpenDay(from = new Date()) {
+        const d = new Date(from);
+        d.setHours(0, 0, 0, 0);
+        while (isSunday(d) || isPastDay(d)) {
+          d.setDate(d.getDate() + 1);
+        }
+        return d;
+      }
+
+      function formatSlotLabel(totalMinutes) {
+        const h = Math.floor(totalMinutes / 60);
+        const m = totalMinutes % 60;
+        const suffix = h >= 12 ? 'PM' : 'AM';
+        const hour12 = ((h + 11) % 12) + 1;
+        return `${hour12}:${pad(m)} ${suffix}`;
+      }
+
+      function serviceDuration() {
+        if (!selection) return 0;
+        return selection.duration + (addNail ? 15 : 0);
+      }
+
+      function durationCopy() {
+        if (!selection) return '';
+        if (selection.serviceType === 'shower_cutting') {
+          return addNail
+            ? 'About 1 hour 45 min (cut + nails)'
+            : 'About 1 hour 30 min';
+        }
+        return addNail ? 'About 1 hour 15 min (shower + nails)' : 'About 1 hour';
+      }
+
+      function overlapsBusy(slotStart, slotEnd) {
+        return busyRanges.some((busy) => {
+          const busyStart = new Date(busy.startTime).getTime();
+          const busyEnd = new Date(busy.endTime).getTime();
+          return slotStart < busyEnd && slotEnd > busyStart;
+        });
+      }
+
+      function buildSlotsForDate(dateValue) {
+        const duration = serviceDuration();
+        if (!selection || !dateValue || !duration) return [];
+
+        const day = parseDateValue(dateValue);
+        if (isSunday(day)) return [];
+
+        const [y, mo, d] = dateValue.split('-').map(Number);
+        const now = new Date();
+        const lastStart = CLOSE_MINUTES - duration;
+        const slots = [];
+
+        for (let mins = OPEN_MINUTES; mins <= lastStart; mins += SLOT_STEP) {
+          const hour = Math.floor(mins / 60);
+          const minute = mins % 60;
+          const slotDate = new Date(y, mo - 1, d, hour, minute, 0, 0);
+          if (slotDate.getTime() < now.getTime() + 5 * 60 * 1000) continue;
+          const slotEnd = new Date(slotDate.getTime() + duration * 60 * 1000);
+          const taken = overlapsBusy(slotDate.getTime(), slotEnd.getTime());
+          slots.push({
+            minutes: mins,
+            label: formatSlotLabel(mins),
+            period: mins < 13 * 60 ? 'Morning' : 'Afternoon',
+            iso: slotDate.toISOString(),
+            taken,
+            endLabel: formatSlotLabel(
+              mins + duration > CLOSE_MINUTES ? CLOSE_MINUTES : mins + duration,
+            ),
+          });
+        }
+        return slots;
+      }
+
+      async function loadAvailability(dateValue) {
+        if (!dateValue || isSunday(parseDateValue(dateValue))) {
+          busyRanges = [];
+          return;
+        }
+        const requestId = ++availabilityRequestId;
+        try {
+          const data = await api(
+            `/bookings/availability?date=${encodeURIComponent(dateValue)}`,
+          );
+          if (requestId !== availabilityRequestId) return;
+          busyRanges = Array.isArray(data.busy) ? data.busy : [];
+        } catch {
+          if (requestId !== availabilityRequestId) return;
+          busyRanges = [];
+        }
+      }
+
+      function renderCalendar() {
+        calMonthLabel.textContent = `${MONTHS[viewMonth]} ${viewYear}`;
+        const first = new Date(viewYear, viewMonth, 1);
+        const startPad = first.getDay();
+        const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+        let html = '';
+        for (let i = 0; i < startPad; i += 1) {
+          html += '<span class="cal-day empty"></span>';
+        }
+
+        for (let day = 1; day <= daysInMonth; day += 1) {
+          const date = new Date(viewYear, viewMonth, day);
+          const value = toDateValue(date);
+          const sunday = isSunday(date);
+          const past = isPastDay(date);
+          const selected = selectedDateValue === value;
+          const classes = ['cal-day'];
+          if (sunday) classes.push('sunday');
+          if (past) classes.push('past');
+          if (selected) classes.push('selected');
+          if (!sunday && !past) classes.push('open');
+
+          const disabled = sunday || past;
+          const title = sunday
+            ? 'Sunday — coffee shop only, no grooming'
+            : past
+              ? 'Past date'
+              : 'Available for grooming';
+
+          html += `<button type="button" class="${classes.join(' ')}" data-date="${value}" ${
+            disabled ? 'disabled' : ''
+          } title="${title}" aria-label="${WEEKDAYS[date.getDay()]} ${day}${
+            sunday ? ', closed for grooming' : ''
+          }"><span class="cal-num">${day}</span>${
+            sunday ? '<span class="cal-tag">Coffee</span>' : ''
+          }</button>`;
+        }
+
+        calGrid.innerHTML = html;
+        calGrid.querySelectorAll('.cal-day.open').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            selectedDateValue = btn.dataset.date;
+            dateHidden.value = selectedDateValue;
+            startHidden.value = '';
+            errorEl.hidden = true;
+            renderCalendar();
+            renderSlots();
+          });
+        });
+      }
+
+      async function renderSlots() {
+        startHidden.value = '';
+
+        if (!selection) {
+          slotDayLabel.textContent = 'Pick a day';
+          slotDayMeta.textContent = 'Choose a service first';
+          slotGrid.innerHTML =
+            '<p class="slot-empty">Select a shower or shower + cut above.</p>';
+          return;
+        }
+
+        if (!selectedDateValue) {
+          slotDayLabel.textContent = 'Pick a day';
+          slotDayMeta.textContent = 'Mon–Sat · 11:00 AM – 4:00 PM';
+          slotGrid.innerHTML =
+            '<p class="slot-empty">Tap an open day on the calendar. Sundays are coffee-only.</p>';
+          return;
+        }
+
+        const day = parseDateValue(selectedDateValue);
+        if (isSunday(day)) {
+          slotDayLabel.textContent = 'Sunday';
+          slotDayMeta.textContent = 'Coffee shop only — no grooming';
+          slotGrid.innerHTML =
+            '<div class="sunday-card"><strong>Closed for grooming</strong><p>Sundays we only run the café. Pick Monday–Saturday for baths and cuts.</p></div>';
+          return;
+        }
+
+        slotDayLabel.textContent = `${WEEKDAYS[day.getDay()]}, ${day.getDate()} ${MONTHS[day.getMonth()]}`;
+        slotDayMeta.textContent = `${durationCopy()} · taken times stay blocked`;
+        slotGrid.innerHTML = '<p class="slot-empty">Checking open times…</p>';
+
+        await loadAvailability(selectedDateValue);
+
+        const slots = buildSlotsForDate(selectedDateValue);
+        const openSlots = slots.filter((s) => !s.taken);
+        if (!slots.length) {
+          slotGrid.innerHTML =
+            '<p class="slot-empty">No times left today — try another open day.</p>';
+          return;
+        }
+        if (!openSlots.length) {
+          slotGrid.innerHTML =
+            '<p class="slot-empty">This day is fully booked for that service length. Try another day or a shorter service.</p>';
+          return;
+        }
+
+        const groups = { Morning: [], Afternoon: [] };
+        slots.forEach((s) => groups[s.period].push(s));
+
+        slotGrid.innerHTML = Object.entries(groups)
+          .filter(([, list]) => list.length)
+          .map(
+            ([period, list]) => `<div class="slot-group">
+              <h4>${period}</h4>
+              <div class="slot-grid">
+                ${list
+                  .map((slot) =>
+                    slot.taken
+                      ? `<button type="button" class="slot-btn taken" disabled title="Already booked until ${slot.endLabel}">
+                          <strong>${slot.label}</strong>
+                          <small>booked</small>
+                        </button>`
+                      : `<button type="button" class="slot-btn" role="option" data-iso="${slot.iso}">
+                          <strong>${slot.label}</strong>
+                          <small>to ${slot.endLabel}</small>
+                        </button>`,
+                  )
+                  .join('')}
+              </div>
+            </div>`,
+          )
+          .join('');
+
+        slotGrid.querySelectorAll('.slot-btn:not(.taken)').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            slotGrid
+              .querySelectorAll('.slot-btn.selected')
+              .forEach((el) => el.classList.remove('selected'));
+            btn.classList.add('selected');
+            startHidden.value = btn.dataset.iso;
+            errorEl.hidden = true;
+          });
+        });
+      }
+
+      function refreshSummary() {
+        if (!selection) {
+          form.hidden = true;
+          selectedEl.textContent =
+            'Select a shower or shower + cut above to start.';
+          totalEl.textContent = '';
+          renderSlots();
+          return;
+        }
+
+        form.hidden = false;
+        const nailText = addNail ? ' + Nail cutting ($2)' : '';
+        selectedEl.innerHTML = `Selected: <strong>${selection.label}</strong>${nailText}<br><span class="muted-inline">${durationCopy()} · Mon–Sat only</span>`;
+        totalEl.textContent = `Total: $${(selection.price + (addNail ? 2 : 0)).toFixed(2)}`;
+        renderCalendar();
+        renderSlots();
+      }
+
+      function ensureDefaultDay() {
+        const open = nextOpenDay(new Date());
+        selectedDateValue = toDateValue(open);
+        dateHidden.value = selectedDateValue;
+        viewYear = open.getFullYear();
+        viewMonth = open.getMonth();
+      }
+
+      document.getElementById('cal-prev').addEventListener('click', () => {
+        viewMonth -= 1;
+        if (viewMonth < 0) {
+          viewMonth = 11;
+          viewYear -= 1;
+        }
+        renderCalendar();
+      });
+
+      document.getElementById('cal-next').addEventListener('click', () => {
+        viewMonth += 1;
+        if (viewMonth > 11) {
+          viewMonth = 0;
+          viewYear += 1;
+        }
+        renderCalendar();
+      });
+
+      document.querySelectorAll('.price-pill').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document
+            .querySelectorAll('.price-pill.selected')
+            .forEach((el) => el.classList.remove('selected'));
+          btn.classList.add('selected');
+          selection = {
+            petSize: btn.dataset.size,
+            serviceType: btn.dataset.service,
+            price: Number(btn.dataset.price),
+            duration: Number(btn.dataset.duration || 60),
+            label: btn.dataset.label,
+          };
+          errorEl.hidden = true;
+          successEl.hidden = true;
+          if (!selectedDateValue) ensureDefaultDay();
+          refreshSummary();
+          form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      });
+
+      nailBtn.addEventListener('click', () => {
+        addNail = !addNail;
+        nailBtn.classList.toggle('selected', addNail);
+        nailBtn.setAttribute('aria-pressed', addNail ? 'true' : 'false');
+        refreshSummary();
+      });
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!selection) return;
+
+        if (!selectedDateValue || parseDateValue(selectedDateValue).getDay() === 0) {
+          errorEl.hidden = false;
+          errorEl.textContent =
+            'Grooming is closed on Sundays. Please choose Monday–Saturday.';
+          return;
+        }
+
+        if (!startHidden.value) {
+          errorEl.hidden = false;
+          errorEl.textContent =
+            'Please choose a time slot between 11:00 AM and 4:00 PM.';
+          return;
+        }
+
+        errorEl.hidden = true;
+        successEl.hidden = true;
+        const button = form.querySelector('button[type="submit"]');
+        button.disabled = true;
+        button.textContent = 'Sending…';
+
+        const raw = Object.fromEntries(new FormData(form).entries());
+
+        try {
+          const result = await api('/bookings', {
+            method: 'POST',
+            body: JSON.stringify({
+              customerName: raw.customerName,
+              petName: raw.petName,
+              phone: raw.phone,
+              startTime: startHidden.value,
+              petSize: selection.petSize,
+              serviceType: selection.serviceType,
+              addNailCutting: addNail,
+              notes: raw.notes || undefined,
+            }),
+          });
+
+          successEl.hidden = false;
+          const bookedDate = new Date(result.startTime).toLocaleDateString(undefined, {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+          });
+          const bookedTime = new Date(result.startTime).toLocaleTimeString(undefined, {
+            hour: 'numeric',
+            minute: '2-digit',
+          });
+          successEl.textContent = `${result.message} ${result.pet.name} — Date: ${bookedDate}. Time: ${bookedTime}. $${Number(result.totalPrice).toFixed(2)}`;
+
+          // Always keep a local copy so the booking section can show date & time right away
+          saveGuestBooking({
+            ...result,
+            customerName: raw.customerName,
+            phone: raw.phone,
+          });
+
+          await loadSavedBookings();
+          form.reset();
+          ensureDefaultDay();
+          startHidden.value = '';
+          renderCalendar();
+          renderSlots();
+        } catch (err) {
+          errorEl.hidden = false;
+          errorEl.textContent = err.message || 'Booking failed';
+        } finally {
+          button.disabled = false;
+          button.textContent = 'Confirm booking';
+        }
+      });
+
+      async function loadSavedBookings() {
+        clearPastGuestBookings();
+        const local = getGuestBookings();
+
+        try {
+          if (isLoggedIn()) {
+            const remote = await api('/me/appointments');
+            const bookings = mergeBookings(remote, local);
+            savedSource.textContent = bookings.length
+              ? 'Your booked dates and times'
+              : 'No bookings yet — pick a service below';
+            savedList.innerHTML = renderBookingCards(bookings, {
+              emptyText: 'No bookings yet. Choose a service and time to book.',
+            });
+            return;
+          }
+
+          savedSource.textContent = local.length
+            ? 'Saved on this device — date & time'
+            : 'No bookings yet — pick a service below';
+          savedList.innerHTML = renderBookingCards(local, {
+            emptyText: 'No bookings yet. Choose a service and time to book.',
+          });
+        } catch {
+          savedSource.textContent = local.length
+            ? 'Saved on this device — date & time'
+            : 'Could not load account bookings';
+          savedList.innerHTML = renderBookingCards(local, {
+            emptyText: 'No bookings yet. Choose a service and time to book.',
+          });
+        }
+      }
+
+      ensureDefaultDay();
+      renderCalendar();
+      renderSlots();
+      loadSavedBookings();
+    </script>
+  </body>
+</html>
