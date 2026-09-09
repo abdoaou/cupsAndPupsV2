@@ -77,7 +77,14 @@ export async function api(path, options = {}) {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  let res = await fetch(apiUrl(path), { ...options, headers });
+  let res;
+  try {
+    res = await fetch(apiUrl(path), { ...options, headers });
+  } catch {
+    throw new Error(
+      `Failed to reach API at ${API_BASE}. On Vercel set DATABASE_URL and open /api/v1/health.`,
+    );
+  }
 
   if (res.status === 401 && !options._retry && path !== '/auth/refresh') {
     const refreshed = await refreshAccessToken();

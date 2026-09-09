@@ -1,6 +1,6 @@
 /**
- * Writes public/js/runtime-config.js at build time.
- * Set CUPS_API_URL or NEXT_PUBLIC_API_URL in Vercel env.
+ * Local helper when developing under apps/web.
+ * On Vercel, scripts/prepare-vercel.js (repo root) is used instead.
  */
 const fs = require('fs');
 const path = require('path');
@@ -11,7 +11,7 @@ const outFile = path.join(outDir, 'runtime-config.js');
 const apiUrl = (
   process.env.CUPS_API_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
-  ''
+  '/api/v1'
 ).replace(/\/$/, '');
 
 fs.mkdirSync(outDir, { recursive: true });
@@ -25,8 +25,4 @@ fs.writeFileSync(
   'utf8',
 );
 
-console.log(
-  apiUrl
-    ? `Vercel runtime config: CUPS_API_URL=${apiUrl}`
-    : 'Vercel runtime config: CUPS_API_URL empty (set it in Vercel env for live API)',
-);
+console.log(`runtime-config.js CUPS_API_URL=${apiUrl}`);

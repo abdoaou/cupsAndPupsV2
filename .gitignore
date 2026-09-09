@@ -3,6 +3,7 @@ dist/
 .next/
 build/
 coverage/
+/public/
 .env
 .env.*
 !.env.example

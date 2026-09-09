@@ -1,11 +1,19 @@
 {
   "framework": null,
-  "installCommand": "echo 'Static site — skip install'",
-  "buildCommand": "node apps/web/scripts/prepare-vercel.js",
-  "outputDirectory": "apps/web/public",
+  "installCommand": "npm install",
+  "buildCommand": "npm run db:generate && node scripts/prepare-vercel.js",
+  "outputDirectory": "public",
   "cleanUrls": true,
   "trailingSlash": false,
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "{apps/api/**,node_modules/.prisma/**,node_modules/@prisma/client/**}",
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
+    { "source": "/api/v1", "destination": "/api" },
+    { "source": "/api/v1/(.*)", "destination": "/api" },
     { "source": "/admin", "destination": "/admin/index.html" },
     { "source": "/admin/login", "destination": "/admin/login.html" },
     { "source": "/admin/bookings", "destination": "/admin/bookings.html" },
