@@ -1,4 +1,9 @@
-const API_BASE = window.CUPS_API_URL || 'http://localhost:4000/api/v1';
+const API_BASE =
+  typeof window !== 'undefined' &&
+  typeof window.CUPS_API_URL === 'string' &&
+  window.CUPS_API_URL.trim()
+    ? window.CUPS_API_URL.replace(/\/$/, '')
+    : 'http://localhost:4000/api/v1';
 
 export function apiUrl(path) {
   return `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`;

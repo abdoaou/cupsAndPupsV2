@@ -1,0 +1,21 @@
+{
+  "framework": null,
+  "installCommand": "echo 'Static site — skip install'",
+  "buildCommand": "node scripts/prepare-vercel.js",
+  "outputDirectory": "apps/web/public",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/admin", "destination": "/admin/index.html" },
+    { "source": "/admin/login", "destination": "/admin/login.html" },
+    { "source": "/admin/bookings", "destination": "/admin/bookings.html" },
+    { "source": "/admin/products", "destination": "/admin/products.html" },
+    { "source": "/admin/menu", "destination": "/admin/menu.html" },
+    { "source": "/book", "destination": "/book.html" },
+    { "source": "/menu", "destination": "/menu.html" },
+    { "source": "/shop", "destination": "/shop.html" },
+    { "source": "/account", "destination": "/account.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/register", "destination": "/register.html" }
+  ]
+}
