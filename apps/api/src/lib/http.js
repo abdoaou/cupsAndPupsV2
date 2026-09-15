@@ -13,16 +13,17 @@ function asyncHandler(fn) {
 
 function errorHandler(err, _req, res, _next) {
   const status = err.status || 500;
-  const message =
-    status === 500 && process.env.NODE_ENV === 'production'
-      ? 'Internal server error'
-      : err.message || 'Request failed';
+  // Surface real errors on Vercel so deploy/DB issues are visible in the browser.
+  const message = err.message || 'Request failed';
 
   if (status >= 500) {
     console.error(err);
   }
 
-  res.status(status).json({ message });
+  res.status(status).json({
+    message,
+    code: err.code || undefined,
+  });
 }
 
 module.exports = { HttpError, asyncHandler, errorHandler };

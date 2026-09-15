@@ -23,17 +23,30 @@ router.get(
     const where = { isAvailable: true };
     if (req.query.category) where.category = String(req.query.category);
 
-    const items = await prisma.menuItem.findMany({
-      where,
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      include: {
-        variants: {
-          where: { isActive: true },
-          orderBy: [{ sortOrder: 'asc' }, { price: 'asc' }, { name: 'asc' }],
+    try {
+      const items = await prisma.menuItem.findMany({
+        where,
+        orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+        include: {
+          variants: {
+            where: { isActive: true },
+            orderBy: [{ sortOrder: 'asc' }, { price: 'asc' }, { name: 'asc' }],
+          },
         },
-      },
-    });
-    res.json(items.map(serializeMenuItem));
+      });
+      res.json(items.map(serializeMenuItem));
+    } catch (err) {
+      // Older DBs may not have menu_item_variants yet.
+      if (String(err.message || '').includes('menu_item_variants')) {
+        const items = await prisma.menuItem.findMany({
+          where,
+          orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+        });
+        res.json(items.map((item) => serializeMenuItem({ ...item, variants: [] })));
+        return;
+      }
+      throw err;
+    }
   }),
 );
 

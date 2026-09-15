@@ -12,10 +12,14 @@
     "dev:web": "npm run dev -w @cups-and-pups/web",
     "build": "npm run build --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
+    "postinstall": "prisma generate --schema=apps/api/prisma/schema.prisma",
     "db:generate": "npm run prisma:generate -w @cups-and-pups/api",
     "db:migrate": "npm run prisma:migrate -w @cups-and-pups/api",
     "db:seed": "npm run prisma:seed -w @cups-and-pups/api",
     "db:studio": "npm run prisma:studio -w @cups-and-pups/api"
+  },
+  "devDependencies": {
+    "prisma": "^6.5.0"
   },
   "engines": {
     "node": ">=20"
