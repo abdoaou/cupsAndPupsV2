@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650;9..144,700&family=Nunito:wght@700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/styles.css" />
@@ -110,7 +110,7 @@
               : Number(product.stockQty || 0);
             return `<article class="product">
               <div class="product-media" aria-hidden="true"></div>
-              <h2>${product.name}</h2>
+              <h2 class="product-name">${product.name}</h2>
               <p class="meta">${product.category.replaceAll('_', ' ')} · ${
                 totalStock > 0 ? 'In stock' : 'Out of stock'
               }</p>

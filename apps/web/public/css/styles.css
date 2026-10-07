@@ -9,6 +9,7 @@
   --steam: #c9b8a4;
   --font-display: "Nunito", ui-rounded, system-ui, sans-serif;
   --font-body: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  --font-product: "Fraunces", "Nunito", ui-serif, Georgia, serif;
 }
 
 *,
@@ -421,11 +422,42 @@ img {
 
 .menu-item-copy {
   display: grid;
-  gap: 0.2rem;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.menu-item-name {
+  display: block;
+  margin: 0;
+  font-family: var(--font-product);
+  font-weight: 650;
+  font-size: clamp(1.2rem, 2.4vw, 1.55rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-optical-sizing: auto;
+  color: var(--espresso);
+  text-wrap: balance;
+}
+
+.menu-item-badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sage) 22%, var(--foam));
+  color: var(--sage-deep);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+  text-transform: lowercase;
 }
 
 .menu-item-copy small {
-  color: var(--mocha);
+  color: color-mix(in srgb, var(--mocha) 88%, transparent);
+  font-size: 0.92rem;
+  line-height: 1.35;
 }
 
 .menu-size-picker {
@@ -513,11 +545,17 @@ img {
   background: linear-gradient(135deg, var(--oat-deep), var(--steam));
 }
 
-.product h2 {
+.product h2,
+.product-name {
   margin: 0;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.25rem;
+  font-family: var(--font-product);
+  font-weight: 650;
+  font-size: clamp(1.25rem, 2.2vw, 1.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-optical-sizing: auto;
+  color: var(--espresso);
+  text-wrap: balance;
 }
 
 .product .meta {
