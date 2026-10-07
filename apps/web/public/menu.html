@@ -35,9 +35,10 @@
       const labels = {
         COFFEE: 'Hot coffee',
         BEVERAGES: 'Iced & cold drinks',
-        FOOD: 'Food & desserts',
+        FOOD: 'Desserts',
+        ADDONS: 'Add-ons',
         PET_TREATS: 'Pet-friendly treats',
-        SPECIALS: 'Signature & add-ons',
+        SPECIALS: 'Signature drinks',
       };
 
       const root = document.getElementById('menu-root');
@@ -100,10 +101,21 @@
         if (!items.length) {
           root.innerHTML = '<p class="lead">Menu coming soon.</p>';
         } else {
-          const preferred = ['COFFEE', 'BEVERAGES', 'SPECIALS', 'FOOD', 'PET_TREATS'];
+          const preferred = [
+            'COFFEE',
+            'BEVERAGES',
+            'SPECIALS',
+            'FOOD',
+            'ADDONS',
+            'PET_TREATS',
+          ];
           const groups = {};
+          const categoryLabels = { ...labels };
           for (const item of items) {
             (groups[item.category] ||= []).push(item);
+            if (item.categoryLabel) {
+              categoryLabels[item.category] = item.categoryLabel;
+            }
           }
           const fromDb = Object.keys(groups);
           const order = [
@@ -115,7 +127,7 @@
             `<button type="button" class="menu-chip active" data-category="">All</button>`,
             ...order.map(
               (key) =>
-                `<button type="button" class="menu-chip" data-category="${key}">${labels[key] || key.replaceAll('_', ' ')}</button>`,
+                `<button type="button" class="menu-chip" data-category="${key}">${categoryLabels[key] || key.replaceAll('_', ' ')}</button>`,
             ),
           ].join('');
 
@@ -141,7 +153,7 @@
                   )
                   .join('');
                 return `<section class="menu-block">
-                  <h2>${labels[key] || key.replaceAll('_', ' ')}</h2>
+                  <h2>${categoryLabels[key] || key.replaceAll('_', ' ')}</h2>
                   <ul>${rows}</ul>
                 </section>`;
               })
