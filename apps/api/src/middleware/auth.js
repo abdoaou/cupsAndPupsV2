@@ -1,6 +1,6 @@
-const { prisma } = require('../lib/prisma');
 const { verifyAccessToken } = require('../lib/auth');
 const { HttpError, asyncHandler } = require('../lib/http');
+const { findAdminById, publicAdmin } = require('../lib/live-store');
 
 function optionalAuth(req, _res, next) {
   const header = req.headers.authorization || '';
@@ -20,16 +20,12 @@ const requireAuth = asyncHandler(async (req, _res, next) => {
   if (!token) throw new HttpError(401, 'Authentication required');
 
   const payload = verifyAccessToken(token);
-  const user = await prisma.user.findUnique({
-    where: { id: payload.sub },
-    select: { id: true, email: true, role: true, isActive: true },
-  });
-
-  if (!user || !user.isActive) {
+  const admin = await findAdminById(payload.sub);
+  if (!admin) {
     throw new HttpError(401, 'User inactive or not found');
   }
 
-  req.user = user;
+  req.user = publicAdmin(admin);
   next();
 });
 

@@ -1,6 +1,6 @@
 const express = require('express');
 const { prisma } = require('../lib/prisma');
-const { HttpError, asyncHandler } = require('../lib/http');
+const { asyncHandler } = require('../lib/http');
 const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -9,25 +9,11 @@ router.get(
   '/',
   requireAuth,
   asyncHandler(async (req, res) => {
-    const user = await prisma.user.findUnique({
-      where: { id: req.user.id },
-      select: {
-        id: true,
-        email: true,
-        phone: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        avatarUrl: true,
-        createdAt: true,
-        loyaltyAccount: {
-          select: { pointsBalance: true, lifetimePoints: true },
-        },
-        _count: { select: { pets: true, orders: true } },
-      },
+    res.json({
+      ...req.user,
+      loyaltyAccount: { pointsBalance: 0, lifetimePoints: 0 },
+      _count: { pets: 0, orders: 0 },
     });
-    if (!user) throw new HttpError(404, 'User not found');
-    res.json(user);
   }),
 );
 
@@ -35,26 +21,33 @@ router.get(
   '/appointments',
   requireAuth,
   asyncHandler(async (req, res) => {
-    const appointments = await prisma.appointment.findMany({
-      where: { customerId: req.user.id },
-      orderBy: { startTime: 'asc' },
-      take: 50,
-      include: {
-        pet: { select: { id: true, name: true, species: true } },
-        services: { include: { service: { select: { name: true } } } },
-      },
-    });
+    if (!req.user.email) {
+      res.json([]);
+      return;
+    }
+
+    const rows = await prisma.$queryRawUnsafe(
+      `
+      SELECT id, customer_name, pet_name, pet_species, service_label,
+             start_at, end_at, status, total_price, customer_notes
+      FROM bookings
+      WHERE lower(COALESCE(customer_email, '')) = lower($1)
+      ORDER BY start_at DESC
+      LIMIT 50
+      `,
+      req.user.email,
+    );
 
     res.json(
-      appointments.map((a) => ({
-        id: a.id,
-        status: a.status,
-        startTime: a.startTime,
-        endTime: a.endTime,
-        totalPrice: a.priceCharged == null ? null : Number(a.priceCharged),
-        notes: a.notes,
-        pet: a.pet,
-        services: a.services.map((s) => s.service.name),
+      rows.map((row) => ({
+        id: String(row.id),
+        status: String(row.status || '').toUpperCase(),
+        startTime: row.start_at,
+        endTime: row.end_at,
+        totalPrice: row.total_price == null ? null : Number(row.total_price),
+        notes: row.customer_notes,
+        pet: { name: row.pet_name, species: row.pet_species },
+        services: row.service_label ? [row.service_label] : [],
       })),
     );
   }),
@@ -64,34 +57,7 @@ router.patch(
   '/',
   requireAuth,
   asyncHandler(async (req, res) => {
-    const { firstName, lastName, phone, avatarUrl } = req.body || {};
-    if (phone) {
-      const taken = await prisma.user.findFirst({
-        where: { phone, NOT: { id: req.user.id } },
-      });
-      if (taken) throw new HttpError(409, 'Phone number already in use');
-    }
-
-    const user = await prisma.user.update({
-      where: { id: req.user.id },
-      data: {
-        firstName: firstName?.trim(),
-        lastName: lastName?.trim(),
-        phone,
-        avatarUrl,
-      },
-      select: {
-        id: true,
-        email: true,
-        phone: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        avatarUrl: true,
-        createdAt: true,
-      },
-    });
-    res.json(user);
+    res.json(req.user);
   }),
 );
 

@@ -15,6 +15,7 @@
     "@cups-and-pups/shared": "*",
     "@prisma/client": "^6.19.3",
     "argon2": "^0.41.1",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
