@@ -76,6 +76,11 @@ router.get(
         AND p.status = 'active'
       ORDER BY
         COALESCE(p.category_id, 9999) ASC,
+        CASE lower(trim(p.name))
+          WHEN 'espresso' THEN 0
+          WHEN 'double espresso' THEN 1
+          ELSE 2
+        END,
         p.name ASC
       `,
       websiteId,

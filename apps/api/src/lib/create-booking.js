@@ -141,25 +141,28 @@ function shopDayBounds(dateValue) {
   return { dayStart, dayEnd, year: y, month: m, day: d };
 }
 
-async function findOverlappingAppointments(startTime, endTime, locationId, { excludeId } = {}) {
-  const where = {
-    locationId,
-    status: { in: BLOCKING_STATUSES },
-    startTime: { lt: endTime },
-    endTime: { gt: startTime },
-  };
-  if (excludeId) where.id = { not: excludeId };
+async function findOverlappingAppointments(startTime, endTime, _locationId, { excludeId } = {}) {
+  const rows = await prisma.$queryRawUnsafe(
+    `
+    SELECT id, start_at, end_at, status::text AS status
+    FROM bookings
+    WHERE status IN ('pending', 'confirmed', 'checked_in', 'in_progress')
+      AND start_at < $1
+      AND end_at > $2
+      AND ($3::bigint IS NULL OR id <> $3::bigint)
+    ORDER BY start_at ASC
+    `,
+    startTime,
+    endTime,
+    excludeId == null ? null : Number(excludeId),
+  );
 
-  return prisma.appointment.findMany({
-    where,
-    orderBy: { startTime: 'asc' },
-    select: {
-      id: true,
-      startTime: true,
-      endTime: true,
-      status: true,
-    },
-  });
+  return rows.map((row) => ({
+    id: String(row.id),
+    startTime: new Date(row.start_at),
+    endTime: new Date(row.end_at),
+    status: String(row.status || '').toUpperCase(),
+  }));
 }
 
 async function assertSlotAvailable(startTime, endTime, locationId, { excludeId } = {}) {
@@ -188,21 +191,7 @@ async function assertSlotAvailable(startTime, endTime, locationId, { excludeId }
 async function getBusyRangesForDate(dateValue, locationId) {
   const { dayStart, dayEnd, year, month, day } = shopDayBounds(dateValue);
 
-  const rows = await prisma.appointment.findMany({
-    where: {
-      locationId,
-      status: { in: BLOCKING_STATUSES },
-      startTime: { lt: dayEnd },
-      endTime: { gt: dayStart },
-    },
-    orderBy: { startTime: 'asc' },
-    select: {
-      id: true,
-      startTime: true,
-      endTime: true,
-      status: true,
-    },
-  });
+  const rows = await findOverlappingAppointments(dayStart, dayEnd, locationId);
 
   // Keep only appointments that fall on this shop-local calendar day
   return rows
@@ -277,12 +266,6 @@ async function createBookingFromPayload(payload) {
     throw new HttpError(400, 'Invalid start time');
   }
 
-  const location = await prisma.location.findFirst({
-    where: { isActive: true },
-    orderBy: { createdAt: 'asc' },
-  });
-  if (!location) throw new HttpError(404, 'No active location found');
-
   let totalPrice = main.price;
   let totalDuration = main.durationMinutes;
   const serviceLines = [
@@ -310,170 +293,83 @@ async function createBookingFromPayload(payload) {
   const endTime = new Date(startTime);
   endTime.setMinutes(endTime.getMinutes() + totalDuration);
 
-  await assertSlotAvailable(startTime, endTime, location.id);
+  await assertSlotAvailable(startTime, endTime);
 
   const normalizedPhone = normalizePhone(phone);
   const { firstName, lastName } = splitName(customerName);
+  const dbStatus = String(status || 'PENDING').toLowerCase();
+  const species = String(main.species || 'DOG').toLowerCase();
+  const addons = addNailCutting
+    ? [{ name: 'Nail cutting', price: 2, durationMinutes: 15 }]
+    : [];
+  const notesText = [sourceNote, notes?.trim() || null].filter(Boolean).join(' · ');
+  const source = /admin/i.test(sourceNote) ? 'admin' : 'online';
 
-  const appointment = await prisma.$transaction(async (tx) => {
-    let customer = null;
+  const inserted = await prisma.$queryRawUnsafe(
+    `
+    INSERT INTO bookings (
+      customer_name,
+      customer_phone,
+      pet_name,
+      pet_species,
+      pet_size,
+      service_type,
+      service_label,
+      duration_minutes,
+      price,
+      addons_json,
+      addons_total,
+      total_price,
+      start_at,
+      end_at,
+      status,
+      source,
+      customer_notes
+    ) VALUES (
+      $1, $2, $3, $4, $5::pet_size, $6::groom_service_type, $7, $8, $9,
+      $10::jsonb, $11, $12, $13, $14, $15::booking_status, $16, $17
+    )
+    RETURNING id, status::text AS status, start_at, end_at, total_price, customer_notes
+    `,
+    String(customerName).trim(),
+    normalizedPhone,
+    String(petName).trim(),
+    species === 'cat' ? 'cat' : 'dog',
+    main.sizeCategory,
+    serviceType,
+    serviceLines.map((line) => line.label).join(' + '),
+    totalDuration,
+    main.price,
+    JSON.stringify(addons),
+    addNailCutting ? 2 : 0,
+    totalPrice,
+    startTime,
+    endTime,
+    dbStatus,
+    source,
+    notesText || null,
+  );
 
-    if (authUserId) {
-      customer = await tx.user.findUnique({ where: { id: authUserId } });
-      if (customer) {
-        customer = await tx.user.update({
-          where: { id: customer.id },
-          data: {
-            firstName,
-            lastName,
-            phone: customer.phone || normalizedPhone,
-          },
-        });
-      }
-    }
-
-    if (!customer) {
-      customer = await tx.user.findFirst({
-        where: { phone: normalizedPhone },
-      });
-    }
-
-    if (!customer) {
-      const email = `guest+${normalizedPhone.replace(/\D/g, '')}@cupsandpups.local`;
-      const existingEmail = await tx.user.findUnique({ where: { email } });
-      if (existingEmail) {
-        customer = existingEmail;
-        if (!customer.phone) {
-          customer = await tx.user.update({
-            where: { id: customer.id },
-            data: { phone: normalizedPhone, firstName, lastName },
-          });
-        }
-      } else {
-        customer = await tx.user.create({
-          data: {
-            email,
-            phone: normalizedPhone,
-            firstName,
-            lastName,
-            role: 'CUSTOMER',
-            loyaltyAccount: { create: {} },
-          },
-        });
-      }
-    } else if (!authUserId) {
-      customer = await tx.user.update({
-        where: { id: customer.id },
-        data: { firstName, lastName },
-      });
-    }
-
-    let pet = await tx.pet.findFirst({
-      where: {
-        ownerId: customer.id,
-        name: { equals: String(petName).trim(), mode: 'insensitive' },
-        isActive: true,
-      },
-    });
-
-    if (!pet) {
-      pet = await tx.pet.create({
-        data: {
-          ownerId: customer.id,
-          name: String(petName).trim(),
-          species: main.species,
-          sizeCategory: main.sizeCategory,
-        },
-      });
-    } else {
-      pet = await tx.pet.update({
-        where: { id: pet.id },
-        data: {
-          species: main.species,
-          sizeCategory: main.sizeCategory,
-        },
-      });
-    }
-
-    const serviceRecords = [];
-    for (const line of serviceLines) {
-      let service = await tx.service.findFirst({
-        where: { locationId: location.id, name: line.label },
-      });
-      if (!service) {
-        service = await tx.service.create({
-          data: {
-            locationId: location.id,
-            name: line.label,
-            description: 'Online booking service',
-            category: 'grooming',
-            basePrice: line.price,
-            durationMinutes: line.durationMinutes,
-            bufferMinutes: 15,
-          },
-        });
-      }
-      serviceRecords.push({ service, line });
-    }
-
-    const notesParts = [
-      sourceNote,
-      `Phone: ${normalizedPhone}`,
-      `Selected: ${serviceLines.map((s) => s.label).join(' + ')}`,
-      notes?.trim() || null,
-    ].filter(Boolean);
-
-    return tx.appointment.create({
-      data: {
-        locationId: location.id,
-        customerId: customer.id,
-        petId: pet.id,
-        startTime,
-        endTime,
-        status,
-        priceCharged: totalPrice,
-        notes: notesParts.join(' · '),
-        services: {
-          create: serviceRecords.map(({ service, line }) => ({
-            serviceId: service.id,
-            price: line.price,
-            durationMinutes: line.durationMinutes,
-          })),
-        },
-      },
-      include: {
-        pet: { select: { id: true, name: true, species: true } },
-        customer: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            phone: true,
-            email: true,
-          },
-        },
-        services: { include: { service: { select: { name: true } } } },
-        staff: {
-          include: { user: { select: { firstName: true, lastName: true } } },
-        },
-      },
-    });
-  });
-
+  const row = inserted[0];
   return {
-    id: appointment.id,
-    status: appointment.status,
-    startTime: appointment.startTime,
-    endTime: appointment.endTime,
-    totalPrice: Number(appointment.priceCharged ?? totalPrice),
-    priceCharged: Number(appointment.priceCharged ?? totalPrice),
-    notes: appointment.notes,
-    customer: appointment.customer,
-    pet: appointment.pet,
-    services: appointment.services.map((s) => s.service.name),
-    staff: appointment.staff
-      ? `${appointment.staff.user.firstName} ${appointment.staff.user.lastName}`
-      : null,
+    id: String(row.id),
+    status: String(row.status || dbStatus).toUpperCase(),
+    startTime: new Date(row.start_at),
+    endTime: new Date(row.end_at),
+    totalPrice: Number(row.total_price),
+    priceCharged: Number(row.total_price),
+    notes: row.customer_notes,
+    customer: {
+      firstName,
+      lastName,
+      phone: normalizedPhone,
+    },
+    pet: {
+      name: String(petName).trim(),
+      species: main.species,
+    },
+    services: serviceLines.map((line) => line.label),
+    staff: null,
     message:
       status === 'PENDING'
         ? 'Booking received! We will confirm shortly.'

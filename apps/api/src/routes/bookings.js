@@ -1,7 +1,6 @@
 const express = require('express');
 const { HttpError, asyncHandler } = require('../lib/http');
 const { optionalAuth } = require('../middleware/auth');
-const { prisma } = require('../lib/prisma');
 const {
   catalogList,
   createBookingFromPayload,
@@ -22,13 +21,7 @@ router.get(
       throw new HttpError(400, 'date is required as YYYY-MM-DD');
     }
 
-    const location = await prisma.location.findFirst({
-      where: { isActive: true },
-      orderBy: { createdAt: 'asc' },
-    });
-    if (!location) throw new HttpError(404, 'No active location found');
-
-    const busy = await getBusyRangesForDate(date, location.id);
+    const busy = await getBusyRangesForDate(date);
     res.json({
       date,
       busy,
