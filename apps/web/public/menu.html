@@ -18,8 +18,8 @@
     <main class="page">
       <h1>Café menu</h1>
       <p class="lead">
-        Every drink is <strong>300,000 L.L.</strong> — except espresso and add-ons.
-        Pick a size to see the old price crossed out.
+        Every drink is <strong>300,000 L.L.</strong> — except espresso, add-ons,
+        and desserts. Pick a size to see the old price crossed out.
       </p>
       <div class="menu-filter-bar" id="menu-filter-bar"></div>
       <div id="menu-root">
@@ -56,7 +56,7 @@
       }
 
       function keepsOriginalPrice(item) {
-        if (item.category === 'ADDONS') return true;
+        if (item.category === 'ADDONS' || item.category === 'FOOD') return true;
         const name = String(item.name || '')
           .trim()
           .toLowerCase()
