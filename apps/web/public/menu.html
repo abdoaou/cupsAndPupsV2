@@ -18,7 +18,8 @@
     <main class="page">
       <h1>Café menu</h1>
       <p class="lead">
-        Pick a category, then choose Small or Large on drinks to see the price.
+        Every drink is <strong>300,000 L.L.</strong> — except espresso and add-ons.
+        Pick a size to see the old price crossed out.
       </p>
       <div class="menu-filter-bar" id="menu-filter-bar"></div>
       <div id="menu-root">
@@ -50,10 +51,33 @@
         return `$${Number(value).toFixed(2)}`;
       }
 
+      function promoDrinkPrice() {
+        return window.PROMO_CONFIG?.drinksPrice || '300,000 L.L.';
+      }
+
+      function keepsOriginalPrice(item) {
+        if (item.category === 'ADDONS') return true;
+        const name = String(item.name || '')
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, ' ');
+        return name === 'espresso' || name === 'double espresso';
+      }
+
+      function priceStack(oldValue) {
+        return `<span class="menu-price-stack">
+          <s class="menu-old-price">${money(oldValue)}</s>
+          <strong class="menu-promo-price">${promoDrinkPrice()}</strong>
+        </span>`;
+      }
+
       function itemPriceMarkup(item) {
+        const keepOld = keepsOriginalPrice(item);
         const variants = (item.variants || []).filter((v) => v.isActive !== false);
         if (!variants.length) {
-          return `<strong>${money(item.price)}</strong>`;
+          return keepOld
+            ? `<strong>${money(item.price)}</strong>`
+            : priceStack(item.price);
         }
 
         const selectedId = selectedSizeByItem[item.id] || variants[0].id;
@@ -72,15 +96,24 @@
                   data-variant="${variant.id}"
                 >
                   <strong>${variant.name}</strong>
-                  <span>${money(variant.price)}</span>
+                  ${
+                    keepOld
+                      ? `<span>${money(variant.price)}</span>`
+                      : `<s class="menu-old-price">${money(variant.price)}</s>`
+                  }
                 </button>`,
               )
               .join('')}
           </div>
-          <strong class="menu-selected-price">${money(selected.price)}</strong>
+          ${
+            keepOld
+              ? `<strong class="menu-selected-price">${money(selected.price)}</strong>
           <small class="variant-diff">
             ${diff > 0 ? `${money(diff)} more than Small` : 'Best entry price'}
-          </small>
+          </small>`
+              : `<span class="menu-selected-price">${priceStack(selected.price)}</span>
+          <small class="variant-diff">Same promo price on every size</small>`
+          }
         </div>`;
       }
 

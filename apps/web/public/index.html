@@ -3,11 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cups &amp; Pups</title>
+    <title>Cups &amp; Pups | Pet Grooming &amp; Café — Sip While They Shine</title>
     <meta
       name="description"
-      content="Pet grooming, pet-friendly café, and pet shop — coffee for you, care for them."
+      content="Pet grooming and café in Lebanon. Sip while they shine: your pet gets a glow-up, you get a free coffee. All drinks 300,000 L.L. Book grooming on WhatsApp."
     />
+    <link rel="canonical" href="https://cupsandpups.store/" />
+    <script type="application/ld+json" id="promo-jsonld">
+      {
+        "@context": "https://schema.org",
+        "@type": ["LocalBusiness", "PetStore", "CafeOrCoffeeShop"],
+        "name": "Cups & Pups",
+        "url": "https://cupsandpups.store/",
+        "description": "Pet grooming and café in Lebanon. Sip while they shine — free coffee with grooming packages. Every drink 300,000 L.L.",
+        "areaServed": { "@type": "Country", "name": "Lebanon" },
+        "openingHours": "Mo-Su 08:00-19:00",
+        "priceRange": "$10–$20",
+        "makesOffer": [
+          { "@type": "Offer", "name": "Cat Shower + Grooming", "price": "15", "priceCurrency": "USD" },
+          { "@type": "Offer", "name": "Cat Shower only", "price": "10", "priceCurrency": "USD" },
+          { "@type": "Offer", "name": "Dog Shower + Grooming + Haircut", "price": "20", "priceCurrency": "USD" },
+          { "@type": "Offer", "name": "Dog Shower only", "price": "12", "priceCurrency": "USD" }
+        ]
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -24,14 +43,68 @@
       <section class="hero">
         <div class="hero-bg" aria-hidden="true"></div>
         <div class="hero-inner">
-          <h1>Cups &amp; Pups</h1>
-          <p>
-            Coffee for you. Care for them. Grooming, café, and pet shop under
-            one roof.
+          <p class="promo-kicker">Cups &amp; Pups</p>
+          <h1 id="promo-headline">Sip While They Shine ☕🐾</h1>
+          <p id="promo-subheadline">
+            Your pet gets a glow-up. You get a free coffee on us.
           </p>
+          <div id="promo-countdown-host"></div>
           <div class="hero-actions">
-            <a class="btn btn-sage" href="/book">Book grooming</a>
-            <a class="btn btn-ghost" href="/menu">See the menu</a>
+            <a
+              class="btn btn-sage"
+              id="promo-wa-cta"
+              href="https://wa.me/961XXXXXXXX"
+              target="_blank"
+              rel="noopener noreferrer"
+            >Book Grooming on WhatsApp</a>
+            <a class="btn btn-ghost" id="promo-prices-cta" href="#prices">See Our Prices</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="prices" aria-labelledby="pamper-heading">
+        <div class="section-inner">
+          <p class="groom-kicker">Pamper Packages</p>
+          <h2 id="pamper-heading">Grooming that comes with coffee</h2>
+          <p class="lead">
+            Friendly prices, any size welcome. Tap Book Now and we will open WhatsApp with the package ready to send.
+          </p>
+          <div id="pamper-packages-root">
+            <noscript>
+              <ul>
+                <li>Cat Shower + Grooming: $15 (+ free coffee)</li>
+                <li>Cat Shower only: $10</li>
+                <li>Dog Shower + Grooming + Haircut: $20 any size (+ free coffee)</li>
+                <li>Dog Shower only: $12</li>
+              </ul>
+            </noscript>
+          </div>
+          <p class="groom-footnote" id="promo-coffee-note">
+            Free coffee applies to grooming packages.
+          </p>
+          <p class="promo-loyalty" id="promo-loyalty" hidden></p>
+          <p class="promo-share-wrap">
+            <a
+              class="btn btn-outline"
+              id="promo-share"
+              href="https://wa.me/?text=Sip%20While%20They%20Shine%20at%20Cups%20%26%20Pups"
+              target="_blank"
+              rel="noopener noreferrer"
+            >Share with a friend</a>
+          </p>
+        </div>
+      </section>
+
+      <section class="section promo-drinks-section" aria-labelledby="promo-drinks-title">
+        <div class="section-inner">
+          <div class="promo-drinks-banner">
+            <div>
+              <h2 id="promo-drinks-title">Every drink: 300,000 L.L.</h2>
+              <p id="promo-drinks-note">
+                Same price on every café drink. Pull up a chair while they shine.
+              </p>
+            </div>
+            <a class="btn btn-foam" id="promo-drinks-cta" href="/menu">See the café menu</a>
           </div>
         </div>
       </section>
@@ -46,9 +119,9 @@
             </p>
           </div>
           <div class="link-list">
-            <a href="/book">
+            <a href="/#prices">
               <strong>Grooming</strong>
-              <span>Live availability and a booking flow that takes under a minute.</span>
+              <span>Pamper packages with WhatsApp booking — free coffee on grooming.</span>
             </a>
             <a href="/menu">
               <strong>Café</strong>

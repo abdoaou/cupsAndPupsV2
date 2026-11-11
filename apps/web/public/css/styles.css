@@ -198,14 +198,14 @@ img {
 .hero-inner {
   position: relative;
   z-index: 1;
-  padding: 7rem 0 4rem;
+  padding: 7rem 0 5.5rem;
 }
 
 .hero h1 {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(3rem, 10vw, 5.5rem);
+  font-size: clamp(2.4rem, 9vw, 5.2rem);
   line-height: 0.95;
   color: var(--foam);
   animation: rise-in 0.8s ease-out both;
@@ -474,6 +474,32 @@ img {
 .menu-selected-price {
   font-size: 1.05rem;
   color: var(--espresso);
+}
+
+.menu-price-stack {
+  display: grid;
+  justify-items: end;
+  gap: 0.15rem;
+  text-align: right;
+}
+
+.menu-old-price {
+  color: #c4312b;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  text-decoration-color: #c4312b;
+  font-weight: 700;
+}
+
+.menu-promo-price {
+  color: var(--espresso);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.size-option .menu-old-price {
+  font-size: 0.92rem;
 }
 
 @media (max-width: 640px) {
@@ -1069,7 +1095,8 @@ input:focus {
   text-transform: lowercase;
 }
 
-.groom-card h2 {
+.groom-card h2,
+.groom-card h3 {
   display: flex;
   align-items: center;
   gap: 0.55rem;
@@ -1662,5 +1689,380 @@ input:focus {
   .nail-strip {
     border-radius: 1.5rem;
     transform: none;
+  }
+}
+
+body.has-promo-announce .hero-inner {
+  padding-top: calc(6.5rem + var(--promo-announce-h, 2.6rem));
+  padding-bottom: 5.5rem;
+}
+
+.promo-announce {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.55rem 2.5rem 0.55rem 1rem;
+  background: var(--espresso);
+  color: var(--foam);
+  text-align: center;
+}
+
+.promo-announce-text {
+  margin: 0;
+  max-width: 52rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.promo-announce-dismiss {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--foam) 12%, transparent);
+  color: var(--foam);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.promo-announce-dismiss:hover,
+.promo-announce-dismiss:focus-visible {
+  background: color-mix(in srgb, var(--foam) 24%, transparent);
+  outline: 2px solid var(--foam);
+  outline-offset: 2px;
+}
+
+body.has-promo-announce .site-header {
+  top: var(--promo-announce-h, 2.6rem);
+}
+
+body.has-promo-announce .page {
+  padding-top: calc(7rem + var(--promo-announce-h, 2.6rem));
+}
+
+.promo-kicker {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--foam) 80%, transparent);
+  animation: rise-in 0.7s ease-out both;
+}
+
+.promo-countdown {
+  margin: 1rem 0 0;
+  display: inline-block;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--foam) 16%, transparent);
+  color: var(--foam);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+#prices {
+  scroll-margin-top: calc(5.75rem + var(--promo-announce-h, 0px));
+}
+
+.promo-group {
+  margin-top: 2.25rem;
+}
+
+.promo-group-title {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.35rem;
+}
+
+.promo-board {
+  margin-top: 0;
+}
+
+.promo-coffee-ribbon {
+  display: inline-block;
+  margin: 0 0 0.65rem 0.35rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: var(--sage);
+  color: var(--foam);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.groom-card .promo-best {
+  background: var(--sage-deep);
+  text-transform: none;
+}
+
+.groom-card.promo-card-hot {
+  background:
+    radial-gradient(
+      circle at 90% 12%,
+      color-mix(in srgb, var(--sage) 36%, transparent),
+      transparent 42%
+    ),
+    #f4f8ef;
+  border-color: var(--sage-deep);
+}
+
+.groom-card .price-value {
+  margin: 0 0 1.1rem;
+}
+
+.promo-book {
+  width: 100%;
+}
+
+.promo-loyalty {
+  margin: 1.25rem 0 0;
+  padding: 0.85rem 1rem;
+  border-radius: 1rem;
+  border: 2px dashed color-mix(in srgb, var(--espresso) 28%, transparent);
+  background: color-mix(in srgb, var(--sage) 12%, var(--foam));
+  color: var(--espresso);
+  font-weight: 600;
+}
+
+.promo-share-wrap {
+  margin: 1.5rem 0 0;
+}
+
+.promo-drinks-section {
+  padding-top: 0;
+}
+
+.promo-drinks-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem 1.4rem;
+  border: 3px solid var(--espresso);
+  border-radius: 1.6rem;
+  background: linear-gradient(120deg, var(--sage) 0%, var(--sage-deep) 100%);
+  color: var(--foam);
+  box-shadow: 6px 6px 0 var(--espresso);
+}
+
+.promo-drinks-banner h2 {
+  color: var(--foam);
+}
+
+.promo-drinks-banner p {
+  margin: 0.5rem 0 0;
+  max-width: 32rem;
+  color: color-mix(in srgb, var(--foam) 88%, transparent);
+}
+
+@media (min-width: 720px) {
+  .promo-drinks-banner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.btn:focus-visible,
+.nav a:focus-visible,
+.promo-flyer-x:focus-visible,
+.promo-flyer-later:focus-visible {
+  outline: 2px solid var(--sage);
+  outline-offset: 3px;
+}
+
+body.has-promo-flyer {
+  overflow: hidden;
+}
+
+.promo-flyer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.promo-flyer.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.promo-flyer-backdrop {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--espresso) 58%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+.promo-flyer-sheet {
+  position: relative;
+  z-index: 1;
+  width: min(34rem, 100%);
+  max-height: min(92svh, 44rem);
+  overflow: auto;
+  padding: 1.35rem 1.2rem 1.25rem;
+  border: 3px solid var(--espresso);
+  border-radius: 1.7rem 1.15rem 1.85rem 1.25rem;
+  background:
+    radial-gradient(circle at 88% 8%, color-mix(in srgb, var(--sage) 26%, transparent), transparent 42%),
+    linear-gradient(165deg, var(--foam), color-mix(in srgb, var(--oat) 72%, var(--foam)));
+  box-shadow: 8px 8px 0 var(--espresso);
+  transform: translateY(18px) rotate(-0.6deg);
+  transition: transform 0.28s ease;
+}
+
+.promo-flyer.is-open .promo-flyer-sheet {
+  transform: translateY(0) rotate(-0.4deg);
+}
+
+.promo-flyer-x {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 2px solid var(--espresso);
+  border-radius: 999px;
+  background: var(--foam);
+  color: var(--espresso);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.promo-flyer-kicker {
+  margin: 0 2.5rem 0.4rem 0;
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: var(--espresso);
+  color: var(--foam);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.promo-flyer-sheet h2 {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.7rem, 6vw, 2.15rem);
+  line-height: 1.05;
+  color: var(--espresso);
+}
+
+.promo-flyer-intro {
+  margin: 0.45rem 0 0;
+  color: var(--mocha);
+  font-size: 1.02rem;
+}
+
+.promo-flyer-offers {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.15rem;
+}
+
+@media (min-width: 560px) {
+  .promo-flyer-offers {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.promo-flyer-card {
+  padding: 0.95rem 0.9rem 1rem;
+  border: 2px solid var(--espresso);
+  border-radius: 1.15rem;
+  background: var(--foam);
+}
+
+.promo-flyer-card.is-drinks {
+  background: linear-gradient(160deg, var(--sage) 0%, var(--sage-deep) 100%);
+  color: var(--foam);
+  border-color: var(--espresso);
+}
+
+.promo-flyer-card.is-groom {
+  background: color-mix(in srgb, var(--sage) 14%, var(--foam));
+}
+
+.promo-flyer-tag {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.promo-flyer-card h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.12rem;
+  line-height: 1.2;
+}
+
+.promo-flyer-price {
+  margin: 0.4rem 0 0.25rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.45rem;
+  line-height: 1.1;
+}
+
+.promo-flyer-card.is-drinks p:last-child,
+.promo-flyer-card.is-groom p:last-child {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.promo-flyer-card.is-groom p:last-child {
+  color: var(--mocha);
+}
+
+.promo-flyer-actions {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 1.15rem;
+}
+
+.promo-flyer-actions .btn {
+  width: 100%;
+}
+
+.promo-flyer-later {
+  border: 0;
+  background: transparent;
+  color: var(--mocha);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.35rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-flyer,
+  .promo-flyer-sheet {
+    transition: none;
   }
 }

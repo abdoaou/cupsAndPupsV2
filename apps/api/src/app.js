@@ -66,7 +66,11 @@ if (!process.env.VERCEL) {
   if (publicDir) {
     app.use(express.static(publicDir));
 
-    const pages = ['book', 'menu', 'shop', 'account', 'login', 'register'];
+    app.get('/book', (_req, res) => {
+      res.redirect(302, '/#prices');
+    });
+
+    const pages = ['menu', 'shop', 'account', 'login', 'register'];
     for (const page of pages) {
       app.get(`/${page}`, (_req, res) => {
         res.sendFile(path.join(publicDir, `${page}.html`));

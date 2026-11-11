@@ -1,20 +1,44 @@
+const http = require('http');
 const path = require('path');
 const express = require('express');
 
 const app = express();
 const PORT = Number(process.env.WEB_PORT || 3000);
 const publicDir = path.join(__dirname, 'public');
+const API_ORIGIN = (
+  process.env.API_URL || 'http://localhost:4000'
+).replace(/\/$/, '');
+
+app.use((req, res, next) => {
+  if (!req.url.startsWith('/api')) return next();
+  const target = new URL(req.url, API_ORIGIN);
+  const headers = { ...req.headers, host: target.host };
+  const proxy = http.request(
+    target,
+    { method: req.method, headers },
+    (upstream) => {
+      res.writeHead(upstream.statusCode || 502, upstream.headers);
+      upstream.pipe(res);
+    },
+  );
+  proxy.on('error', () => {
+    if (!res.headersSent) {
+      res.status(502).json({
+        message:
+          'API is not running. In another terminal run: npm run dev:api',
+      });
+    }
+  });
+  req.pipe(proxy);
+});
+
+app.get(['/book', '/book.html'], (_req, res) => {
+  res.redirect(302, '/#prices');
+});
 
 app.use(express.static(publicDir));
 
-const pages = [
-  'book',
-  'menu',
-  'shop',
-  'account',
-  'login',
-  'register',
-];
+const pages = ['menu', 'shop', 'account', 'login', 'register'];
 
 for (const page of pages) {
   app.get(`/${page}`, (_req, res) => {

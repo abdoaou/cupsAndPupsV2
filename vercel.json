@@ -11,6 +11,10 @@
       "maxDuration": 30
     }
   },
+  "redirects": [
+    { "source": "/book", "destination": "/#prices", "permanent": false },
+    { "source": "/book.html", "destination": "/#prices", "permanent": false }
+  ],
   "rewrites": [
     { "source": "/api/v1", "destination": "/api" },
     { "source": "/api/v1/(.*)", "destination": "/api" },
@@ -19,7 +23,6 @@
     { "source": "/admin/bookings", "destination": "/admin/bookings.html" },
     { "source": "/admin/products", "destination": "/admin/products.html" },
     { "source": "/admin/menu", "destination": "/admin/menu.html" },
-    { "source": "/book", "destination": "/book.html" },
     { "source": "/menu", "destination": "/menu.html" },
     { "source": "/shop", "destination": "/shop.html" },
     { "source": "/account", "destination": "/account.html" },

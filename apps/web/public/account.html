@@ -34,7 +34,7 @@
         </div>
         <div class="my-bookings-list" id="my-bookings-list"></div>
         <p class="form-note">
-          Need another scrub? <a href="/book">Book grooming</a>
+          Need another scrub? <a href="/#prices">Book grooming</a>
         </p>
       </section>
     </main>
@@ -62,7 +62,7 @@
         saveUser(profile);
         leadEl.textContent = `Hi ${profile.firstName} — here are your saved grooming times.`;
         actionsEl.innerHTML = `
-          <a class="btn btn-espresso" href="/book">Book again</a>
+          <a class="btn btn-espresso" href="/#prices">Book again</a>
           <button type="button" class="btn btn-outline" id="logout-btn">Log out</button>
         `;
         document.getElementById('logout-btn').addEventListener('click', () => {
